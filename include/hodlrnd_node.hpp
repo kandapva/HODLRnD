@@ -45,7 +45,7 @@ public:
     double cx, cy;
 
     int charge_start, charge_end;
-    int n_particles, n_neighbours, n_intraction;
+    int n_particles, n_neighbour, n_intraction;
     bool isleaf = false;
     bool isroot;
     std::vector<int> DLR, AFLR; // Diagonal Low Rank, Adjacent Full Rank Block
@@ -70,7 +70,7 @@ public:
         this->charges = charges;
         myproc = 0;
         myprocd = 0;
-        n_neighbours = 0;
+        n_neighbour = 0;
         n_intraction = 0;
         wload = 0;
         std::cout << "Tol - " << tol << std::endl;
@@ -206,7 +206,7 @@ void Node::get_news()
         AFLR.push_back(east);
     if (north != -1)
         AFLR.push_back(north);
-    n_neighbours = AFLR.size();
+    n_neighbour = AFLR.size();
 }
 
 void Node::get_Low_rank_list()
@@ -246,9 +246,9 @@ void Node::Initialize_node()
                                      my_intr_list_addr[i]->n_particles);
         if (isleaf)
         {
-            P2P = new Mat[n_neighbours];
+            P2P = new Mat[n_neighbour];
             P2P_self = K_reorder->getMatrix(charge_start, charge_start, n_particles, n_particles);
-            for (int i = 0; i < n_neighbours; i++)
+            for (int i = 0; i < n_neighbour; i++)
                 if (my_neighbour_addr[i]->n_particles != 0)
                     P2P[i] = K_reorder->getMatrix(charge_start,
                                                   my_neighbour_addr[i]->charge_start,
@@ -282,7 +282,7 @@ void Node::mat_vec(const Vec &x) //,Vec& b)
         if (isleaf)
         {
             node_charge += P2P_self * x.segment(charge_start, n_particles);
-            for (int i = 0; i < n_neighbours; i++)
+            for (int i = 0; i < n_neighbour; i++)
                 if (my_neighbour_addr[i]->n_particles != 0)
                     node_charge += P2P[i] * x.segment(my_neighbour_addr[i]->charge_start, my_neighbour_addr[i]->n_particles);
         }
