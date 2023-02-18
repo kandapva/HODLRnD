@@ -26,8 +26,16 @@
 using std::string;
 using namespace Eigen;
 
+// HODLR matrix parameters
 const int NDIM = 2;
 const int Nmax = 500;
+// The admissibility is based on the max norm of the center
+const double eta_admissible = 1;
+const double eps_aca = pow(10,-8);
+
+int mod(int a, int b){
+    return ((a % b + b) % b);
+}
 
 #ifdef USE_FLOAT
     using dtype = float;

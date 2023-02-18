@@ -2,9 +2,21 @@
 #include <eigen3/Eigen/Dense>
 
 #include "HDD_clusters.hpp"
+#include "kernel_function.hpp"
+
 
 using namespace std;
 
+class userkernel{
+    public:
+        userkernel(){
+        }
+    dtype_base getMatrixEntry(int i, int j){
+        return dtype_base(i+j);
+    }
+    ~userkernel(){
+    }
+};
 Eigen::VectorXd cheb_nodes(double a, double b, int n)
 {
     Eigen::VectorXd X(n);
@@ -49,10 +61,15 @@ int main()
     cluster A(X,Y,gridPoints);
     A.add_points(v);
     std::vector<cluster *> t;
-    A.print_cluster();
+    //A.print_cluster();
     A.level_clustering(t);
     //for(int i=0;i<t.size();i++)
         //t[i]->print_cluster();
+    userkernel *add;
+    kernel_function<userkernel> *kernelfunc = new kernel_function<userkernel>(add);
+    std::cout << kernelfunc->getRow(2, 1, 10) << endl;
+    std::cout << kernelfunc->getCol(2, 1, 10) << endl;
+
     return 0;
     }
 
