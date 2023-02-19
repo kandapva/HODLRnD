@@ -30,8 +30,8 @@ using namespace Eigen;
 const int NDIM = 2;
 const int Nmax = 500;
 // The admissibility is based on the max norm of the center
-const double eta_admissible = 1;
-const double eps_aca = pow(10,-8);
+const int INTERACTION_TYPE_ALLOWED = 1; // This represents d'
+const double eps_ACA = pow(10,-8);
 
 int mod(int a, int b){
     return ((a % b + b) % b);

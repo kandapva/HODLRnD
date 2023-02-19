@@ -4,11 +4,13 @@
 #include "myHeaders.hpp"
 #include "points_dt.hpp"
 #include "HDD_clusters.hpp"
+#include "kernel_function.hpp"
 
-
-class Node{
+template <class Kernel>
+class Node
+{
+    kernel_function<Kernel> *userkernel;
     size_t self_id;
-    ptsnD cluster_center; // Computed post initialisation of all the nodes for the tree
     bool isleaf = false;
     bool isroot;
     // Matrix operators ... Full memory
@@ -18,10 +20,19 @@ class Node{
     Vec node_potential;
     // Matrix operators ... reduced memory
     // TODO : MEM efficient ACA
+    bool is_admissible(Node *A){
+        // Check the max norm between the center of two clusters
+        double dist_btwn_cluster_center = max_norm_distance(this->cluster_center, A->cluster_center);
+        if (dist_btwn_cluster_center < 1.5 * this->my_cluster->get_diameter())
+            if (interaction_type(this, A) > INTERACTION_TYPE_ALLOWED)
+                return false;
+        return true;
+    }
 
 public:
     Node *parent;
     cluster *my_cluster;
+    ptsnD cluster_center; // Computed post initialisation of all the nodes for the tree
     size_t n_particles;
     std::vector<Node *> Child;
     std::vector<Node *> my_neighbour_addr;
@@ -59,26 +70,72 @@ public:
 };
 
 // Routine to compute the interaction list and neighbor list
-void Node::Initialize_node()
+template<class Kernel>
+void Node<Kernel>::Initialize_node()
 {
     // Initialise the matrix operators - Full memory
-
+    if (n_particles != 0)
+    {
+        node_charge = Vec::Zero(n_particles);
+        L2P = new Mat[n_intraction];
+        P2M = new Mat[n_intraction];
+        for (int i = 0; i < n_intraction; i++)
+            if (my_intr_list_addr[i]->n_particles != 0)
+                userkernel->ACA_FAST(L2P[i], P2M[i], eps_ACA,
+                                     my_cluster->index_of_points,
+                                     my_intr_list_addr[i]->my_cluster->index_of_points);
+        if (isleaf)
+        {
+            P2P = new Mat[n_neighbours];
+            P2P_self = userkernel->getMatrix(my_cluster->index_of_points, my_cluster->index_of_points);
+            for (int i = 0; i < n_neighbours; i++)
+                if (my_neighbour_addr[i]->n_particles != 0)
+                    P2P[i] = userkernel->getMatrix(my_cluster->index_of_points,
+                                                   my_neighbour_addr[i]->my_cluster->index_of_points);
+        }
+    }
     //TODO : Initialise the matrix operator - Reduced memory
 }
-
-void Node::get_interaction_list(){
-
-    n_neighbours = my_neighbour_addr.size();
-    n_intraction = my_intr_list_addr.size();
+template<class Kernel>
+void Node<Kernel>::get_interaction_list()
+{
+    if(!isroot){
+        // The interaction list consists of nodes from two sources
+        //      1) Siblings
+        for (int i = 0; i < this->parent->Child.size(); i++){
+            Node<Kernel> *tmp = this->parent->Child[i];
+            if (this->self_id != tmp->self_id)
+                if(this->is_admissible(tmp))
+                    this->my_intr_list_addr.append(tmp);
+                else
+                    this->my_neighbour_addr.append(tmp);
+        }
+        //      2) Children of one's parent's neighbours
+        for (int i = 0; i < this->parent->my_neighbour_addr.size(); i++){
+            for (int j = 0; j < this->parent->my_neighbour_addr[i]->Child.size(); j++){
+                Node<Kernel> *tmp = this->parent->my_neighbour_addr[i]->Child[j];
+                if (this->is_admissible(tmp))
+                    this->my_intr_list_addr.append(tmp);
+                else
+                    this->my_neighbour_addr.append(tmp);
+            }   
+        }
+    }
+    this->n_neighbours = this->my_neighbour_addr.size();
+    this->n_intraction = this->my_intr_list_addr.size();
 }
-void Node::set_node_charge(Vec& b){
+
+template <class Kernel>
+void Node<Kernel>::set_node_charge(Vec &b)
+{
     node_charge = Vec::Zero(n_particles);
     for (size_t i = 0; i < n_particles; i++){
         size_t tmp = my_cluster->index_of_points[i];
         node_charge(i) = b(tmp);
     }
 }
-void Node::get_node_potential(){
+template<class Kernel>
+void Node<Kernel>::get_node_potential(){
     // Routine for Full memory matvec
     if(isleaf){
         if(n_particles != 0){
@@ -93,8 +150,8 @@ void Node::get_node_potential(){
             node_potential += (L2P[i] * (P2M[i].transpose() * my_neighbour_addr[i]->node_charge));
     // TODO : Routine Reduced memory matvec
 }
-
-void Node::collect_potential(Vec &b)
+template <class Kernel>
+void Node<Kernel>::collect_potential(Vec &b)
 {
     // Collects the potential
     node_charge = Vec::Zero(n_particles);

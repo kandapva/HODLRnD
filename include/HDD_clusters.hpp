@@ -10,6 +10,7 @@ class cluster
     size_t N;
     std::vector<ptsnD> *gridPoints;
     double x1[NDIM], x2[NDIM];
+    double diam;
     int level; // This is the level in the hierarchical clustering
     // Bounding box of the cluster! [x1[1], x2[1]] is the interval in dimension 1 and x1[1] < x2[1]
     // the bounding box here is provided by the user, TODO : If not provided the minimum possible hypercube that fits set of points needs to be done
@@ -21,12 +22,15 @@ public:
     {
         N = 0;
         this->gridPoints = gPoints;
-        // TODO : Optimize copy
+        diam = 0.0;
+            // TODO : Optimize copy
         for (int i = 0; i < NDIM; i++)
         {
             this->x1[i] = x1(i);
             this->x2[i] = x2(i);
+            diam += (x1(i) - x2(i)) * (x1(i) - x2(i)); 
         }
+        diam = sqrt(diam);
         cluster_id = 0;
     }
     void add_point(size_t a)
@@ -42,6 +46,9 @@ public:
     size_t get_cluster_size()
     {
         return N;
+    }
+    double get_diameter(){
+        return diam;
     }
     void compute_cluster_center(ptsnD& c){
         // Compute cluster center
@@ -102,11 +109,19 @@ public:
             binary_clusters.push_back(B);
         }
     }
-
-    ~cluster()
-    {
+    friend int interaction_type(cluster* A, cluster* B);
+    ~cluster(){
     }
 };
+
+int interaction_type(cluster* A, cluster* B){
+    int type_sharing = NDIM;
+    // This ensures whether cluster |A|  |B| in the ith dimension image
+    for(int i=0; i<NDIM; i++)
+        if (abs(A->x2[i] - B->x2[i]) != 0 && abs(A->x1[i] - B->x1[i]) != 0) 
+            type_sharing--;
+    return type_sharing;
+}
 
 
 // TODO : Find the bounding box

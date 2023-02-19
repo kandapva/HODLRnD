@@ -5,14 +5,16 @@
 #include "HDD_node.hpp" 
 #include "HDD_clusters.hpp"
 
-// Hierarchical Tree structure 
-class Tree{
-size_t N;
-std::vector<ptsnD> *gridPoints;
-std::vector<std::vector<Node *>> obj_arr;
-Node *root;
-int level = 0;
-cluster *src;
+// Hierarchical Tree structure
+template <class Kernel>
+class Tree
+{
+    size_t N;
+    std::vector<ptsnD> *gridPoints;
+    std::vector<std::vector<Node *>> obj_arr;
+    Node *root;
+    int level = 0;
+    cluster *src;
 public:
 // Constructor for the matrix data structure
     Tree(Eigen::VectorXd x1, Eigen::VectorXd x2, std::vector<ptsnD> *gPoints)
@@ -43,13 +45,18 @@ public:
             }
             // Decide whether leaf level reached
             Nlevel = obj_arr[level+1][0]->n_particles; 
-            for (size_t j = 0; j < obj_arr[level + 1].size(); j++) 
-                if (obj_arr[level+1][j]->n_particles > Nlevel)
+            for (size_t j = 0; j < obj_arr[level + 1].size(); j++) {
+                obj_arr[level + 1][j]->get_interaction_list();
+                if (obj_arr[level + 1][j]->n_particles > Nlevel)
                     Nlevel = obj_arr[level + 1][j]->n_particles;
+            }
+                
             level++;
         }
         // Mark level as leaf
-    // Connection to the other nodes
+        for (size_t j = 0; j < obj_arr[level + 1].size(); j++)
+            obj_arr[level][j]->isleaf = true;
+        // Connection to the other nodes
     }
     // Initialise the matrix operators
     void Initialise_tree(){

@@ -30,14 +30,13 @@ class HODLRdD_matrix
         return N;
     }
     // Assemble the matrix operators 
-    void Assemble_matrix_operators();
-    // mat-vec product
-    Vec mat_mat_product(Vec& x){
-        return HODLRdD_tree->matvec(x);
-    } 
+    void Assemble_matrix_operators(){
+        HODLRdD_tree->Initialise_tree();
+    }
+    // mat-vec product or mat-mat product
     Vec operator*(Vec x)
     {
-        Vec b = mat_mat_product(x);
+        Vec b = HODLRdD_tree->matvec(x);
         return b;
     }
 
