@@ -39,8 +39,10 @@ public:
     int n_neighbours, n_intraction;
     std::vector<Node *> my_intr_list_addr;
     // Node can be initialised with just parent and child information
-    Node(cluster* src){
+    Node(cluste *&src, kernel_function<Kernel>*& usr_)
+    {
         this->my_cluster = src;
+        this->userkernel = usr_;
         n_neighbours = 0;
         n_intraction = 0;
         n_particles = src->get_cluster_size();
@@ -49,9 +51,10 @@ public:
         this->my_cluster->compute_cluster_center(cluster_center);
         cluster_center.id = -1;
     }
-    Node(cluster* src, Node *&parent_)
+    Node(cluster *&src, Node *&parent_, kernel_function<Kernel>*& usr_)
     {
         this->parent = parent_;
+        this->userkernel = usr_;
         n_neighbours = 0;
         n_intraction = 0;
         n_particles = src->get_cluster_size();
@@ -65,8 +68,23 @@ public:
     void Initialize_node();
     void get_interaction_list();
     void get_node_potential();
-    void set_node_charge(Vec &b);
-    void collect_potential(Vec &b);
+    void set_node_charge(const Vec &b){
+        node_charge = Vec::Zero(n_particles);
+        for (size_t i = 0; i < n_particles; i++)
+        {
+            size_t tmp = my_cluster->index_of_points[i];
+            node_charge(i) = b(tmp);
+        }
+    }
+    void collect_potential(Vec& b){
+        // Collects the potential
+        // node_charge = Vec::Zero(n_particles);
+        for (size_t i = 0; i < n_particles; i++)
+        {
+            size_t tmp = my_cluster->index_of_points[i];
+            b(tmp) += node_potential(i);
+        }
+    }
 };
 
 // Routine to compute the interaction list and neighbor list
@@ -125,15 +143,6 @@ void Node<Kernel>::get_interaction_list()
     this->n_intraction = this->my_intr_list_addr.size();
 }
 
-template <class Kernel>
-void Node<Kernel>::set_node_charge(Vec &b)
-{
-    node_charge = Vec::Zero(n_particles);
-    for (size_t i = 0; i < n_particles; i++){
-        size_t tmp = my_cluster->index_of_points[i];
-        node_charge(i) = b(tmp);
-    }
-}
 template<class Kernel>
 void Node<Kernel>::get_node_potential(){
     // Routine for Full memory matvec
@@ -149,16 +158,5 @@ void Node<Kernel>::get_node_potential(){
         if (my_intr_list_addr[i]->n_particles != 0)
             node_potential += (L2P[i] * (P2M[i].transpose() * my_neighbour_addr[i]->node_charge));
     // TODO : Routine Reduced memory matvec
-}
-template <class Kernel>
-void Node<Kernel>::collect_potential(Vec &b)
-{
-    // Collects the potential
-    node_charge = Vec::Zero(n_particles);
-    for (size_t i = 0; i < n_particles; i++)
-    {
-        size_t tmp = my_cluster->index_of_points[i];
-        b(tmp) = node_charge(i);
-    }
 }
 #endif
