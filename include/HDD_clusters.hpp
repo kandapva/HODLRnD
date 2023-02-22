@@ -11,6 +11,7 @@ class cluster
     std::vector<ptsnD> *gridPoints;
     double x1[NDIM], x2[NDIM];
     double diam;
+    double L;
     int level; // This is the level in the hierarchical clustering
     // Bounding box of the cluster! [x1[1], x2[1]] is the interval in dimension 1 and x1[1] < x2[1]
     // the bounding box here is provided by the user, TODO : If not provided the minimum possible hypercube that fits set of points needs to be done
@@ -23,12 +24,15 @@ public:
         N = 0;
         this->gridPoints = gPoints;
         diam = 0.0;
-            // TODO : Optimize copy
+        L = abs(this->x1[0] - this->x2[0]);
+        // TODO : Optimize copy
         for (int i = 0; i < NDIM; i++)
         {
             this->x1[i] = x1(i);
             this->x2[i] = x2(i);
-            diam += (x1(i) - x2(i)) * (x1(i) - x2(i)); 
+            if (abs(this->x1[i] - this->x2[i]) > L)
+                L = abs(this->x1[i] - this->x2[i]);
+            diam += (x1(i) - x2(i)) * (x1(i) - x2(i));
         }
         diam = sqrt(diam);
         cluster_id = 0;
@@ -38,7 +42,7 @@ public:
         index_of_points.push_back(a);
         N++;
     }
-    void add_points(std::vector<int> a)
+    void add_points(std::vector<size_t> a)
     {
         index_of_points.insert(index_of_points.end(), a.begin(), a.end());
         N = index_of_points.size();
@@ -109,17 +113,33 @@ public:
             binary_clusters.push_back(B);
         }
     }
-    friend int interaction_type(cluster* A, cluster* B);
+    double box_length(){
+        return L;
+    }
+    friend int interaction_type(cluster*& A, cluster*& B);
     ~cluster(){
     }
 };
 
-int interaction_type(cluster* A, cluster* B){
+int interaction_type(cluster*& A, cluster*& B){
+    // int type_sharing = NDIM;
+    // for(int i=0; i<NDIM; i++)
+    //     if (abs(A->x2[i] - B->x2[i]) != 0 && abs(A->x1[i] - B->x1[i]) != 0) 
+    //         type_sharing--;
+    // return type_sharing;
     int type_sharing = NDIM;
+    ptsnD a,b;
+    A->compute_cluster_center(a);
+    B->compute_cluster_center(b);
+    double L = std::max(A->box_length(),B->box_length());
     // This ensures whether cluster |A|  |B| in the ith dimension image
-    for(int i=0; i<NDIM; i++)
-        if (abs(A->x2[i] - B->x2[i]) != 0 && abs(A->x1[i] - B->x1[i]) != 0) 
-            type_sharing--;
+    double dp = nd_points::euclidean_distance(a, b) / L;
+    dp *= dp;
+    //std::cout << "Frac : "<< dp <<std::endl;
+    if (double(NDIM)+1 > dp) 
+        type_sharing -= std::round(dp);
+    else
+        type_sharing = -1;
     return type_sharing;
 }
 

@@ -11,8 +11,7 @@ class Node
 {
     kernel_function<Kernel> *userkernel;
     size_t self_id;
-    bool isleaf = false;
-    bool isroot;
+
     // Matrix operators ... Full memory
     Mat P2P_self;
     Mat *P2P, *P2M, *L2P;
@@ -20,26 +19,28 @@ class Node
     Vec node_potential;
     // Matrix operators ... reduced memory
     // TODO : MEM efficient ACA
-    bool is_admissible(Node *A){
+    bool is_admissible(Node<Kernel>*& A){
         // Check the max norm between the center of two clusters
-        double dist_btwn_cluster_center = max_norm_distance(this->cluster_center, A->cluster_center);
+        double dist_btwn_cluster_center = nd_points::max_norm_distance(this->cluster_center, A->cluster_center);
         if (dist_btwn_cluster_center < 1.5 * this->my_cluster->get_diameter())
-            if (interaction_type(this, A) > INTERACTION_TYPE_ALLOWED)
+            if (interaction_type(this->my_cluster, A->my_cluster) > INTERACTION_TYPE_ALLOWED)
                 return false;
         return true;
     }
 
 public:
-    Node *parent;
+    Node<Kernel> *parent;
     cluster *my_cluster;
     ptsnD cluster_center; // Computed post initialisation of all the nodes for the tree
     size_t n_particles;
-    std::vector<Node *> Child;
-    std::vector<Node *> my_neighbour_addr;
+    bool isleaf = false;
+    bool isroot;
+    std::vector<Node<Kernel> *> Child;
+    std::vector<Node<Kernel> *> my_neighbour_addr;
     int n_neighbours, n_intraction;
-    std::vector<Node *> my_intr_list_addr;
+    std::vector<Node<Kernel> *> my_intr_list_addr;
     // Node can be initialised with just parent and child information
-    Node(cluste *&src, kernel_function<Kernel>*& usr_)
+    Node(cluster *&src, kernel_function<Kernel>*& usr_)
     {
         this->my_cluster = src;
         this->userkernel = usr_;
@@ -122,20 +123,21 @@ void Node<Kernel>::get_interaction_list()
         //      1) Siblings
         for (int i = 0; i < this->parent->Child.size(); i++){
             Node<Kernel> *tmp = this->parent->Child[i];
-            if (this->self_id != tmp->self_id)
+            if (this->self_id != tmp->self_id){
                 if(this->is_admissible(tmp))
-                    this->my_intr_list_addr.append(tmp);
+                    this->my_intr_list_addr.push_back(tmp);
                 else
-                    this->my_neighbour_addr.append(tmp);
+                    this->my_neighbour_addr.push_back(tmp);
+            }
         }
         //      2) Children of one's parent's neighbours
         for (int i = 0; i < this->parent->my_neighbour_addr.size(); i++){
             for (int j = 0; j < this->parent->my_neighbour_addr[i]->Child.size(); j++){
                 Node<Kernel> *tmp = this->parent->my_neighbour_addr[i]->Child[j];
                 if (this->is_admissible(tmp))
-                    this->my_intr_list_addr.append(tmp);
+                    this->my_intr_list_addr.push_back(tmp);
                 else
-                    this->my_neighbour_addr.append(tmp);
+                    this->my_neighbour_addr.push_back(tmp);
             }   
         }
     }

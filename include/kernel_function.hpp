@@ -9,7 +9,7 @@ class kernel_function
 {
     Operator *kernel;
 public :
-    kernel_function(Operator *A){
+    kernel_function(Operator*& A){
         this->kernel = A;
     }
     // Returns individual entries of the matrix:
@@ -21,8 +21,10 @@ public :
         int n_cols = targets.size();
         Vec row(n_cols);
         // #pragma omp parallel for
-        for (int k = 0; k < n_cols; k++)
+        for (int k = 0; k < n_cols; k++){
             row(k) = kernel->getMatrixEntry(j, targets[k]);
+        }
+            
         return row;
     }
 

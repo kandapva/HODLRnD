@@ -10,7 +10,7 @@ template <class Kernel>
 class HODLRdD_matrix
 {
     size_t N;
-    Tree *HODLRdD_tree; // this is private to the matrix
+    Tree<Kernel> *HODLRdD_tree; // this is private to the matrix
     kernel_function<Kernel> *kernel_func;
     std::vector<ptsnD> *gridPoints;
     cluster *src;
@@ -26,7 +26,7 @@ public:
         // Initialise the grid points to cluste
         // This initialises the grid points, this creates the hierarchical tre
         // Initialize the hierarchical 2^d tree
-        HODLRdD_tree = new Tree(src, gPoints, kernel_func);
+        HODLRdD_tree = new Tree<Kernel>(src, gPoints, kernel_func);
     }
     // Size of the matrix
     size_t get_size(){
@@ -44,7 +44,6 @@ public:
     }
 
     // Assemble the operators and access to the Tree structure
-    
     // solve using GMRES
     Vec solve(const Vec& b){
         Vec x = Vec::Zero(b.size());

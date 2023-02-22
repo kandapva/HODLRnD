@@ -1,22 +1,15 @@
 #include<iostream>
 #include <eigen3/Eigen/Dense>
 
+#include "HDD_matrix.hpp"
 #include "HDD_clusters.hpp"
 #include "kernel_function.hpp"
+#include "myHeaders.hpp"
+#include "points_dt.hpp"
+
+    using namespace std;
 
 
-using namespace std;
-
-class userkernel{
-    public:
-        userkernel(){
-        }
-    dtype_base getMatrixEntry(int i, int j){
-        return dtype_base(i+j);
-    }
-    ~userkernel(){
-    }
-};
 Eigen::VectorXd cheb_nodes(double a, double b, int n)
 {
     Eigen::VectorXd X(n);
@@ -31,11 +24,55 @@ Eigen::VectorXd cheb_nodes(double a, double b, int n)
     return X;
 }
 
+class userkernel{
+    std::vector<ptsnD> gridPoints; // location of particles in the domain
+public:
+    userkernel()
+    {
+        VectorXd Xdir, Ydir;
+        int numPoints = 10;
+        // std::cout << "Cheb Points" << std::endl;
+        Eigen::VectorXd X(2), Y(2);
+        X(0) = -1;
+        X(1) = -1;
+        Y(0) = 1;
+        Y(1) = 1;
+        //gridPoints = new std::vector<ptsnD>; // location of particles in the domain
+        int cts = 0;
+        Xdir = cheb_nodes(X(0), Y(0), numPoints);
+        //std::cout << Xdir << std::endl;
+        Ydir = cheb_nodes(X(1), Y(1), numPoints);
+        int N = numPoints * numPoints;
+        for (size_t i = 0; i < numPoints; i++)
+            for (size_t j = 0; j < numPoints; j++)
+            {
+                ptsnD temp;
+                temp.x[0] = Ydir[i];
+                temp.x[1] = Xdir[j];
+                temp.id = cts++;
+                gridPoints.push_back(temp);
+            }
+        }
+    dtype_base getMatrixEntry(int i, int j){
+        double r = 0.0;
+        ptsnD a,b;
+        a = gridPoints[i];
+        b = gridPoints[j];
+        r = nd_points::euclidean_distance(a, b);
+        r = 1/r;
+        return r;
+    }
+
+    ~userkernel(){
+    }
+};
+
+
 int main()
 {
     VectorXd Xdir, Ydir;
     std::vector<ptsnD> *gridPoints; // location of particles in the domain
-
+    int numPoints = 10;
     std::cout << "Cheb Points" << std::endl;
     Eigen::VectorXd X(2), Y(2);
     X(0) = -1;
@@ -44,11 +81,12 @@ int main()
     Y(1) = 1;
     gridPoints = new std::vector<ptsnD>; // location of particles in the domain
     int cts = 0;
-    Xdir = cheb_nodes(X(0), Y(0), 6);
+    Xdir = cheb_nodes(X(0), Y(0), numPoints);
     std::cout << Xdir << std::endl;
-    Ydir = cheb_nodes(X(1), Y(1), 6);
-    for (size_t i = 0; i < 5; i++)
-        for (size_t j = 0; j < 5; j++)
+    Ydir = cheb_nodes(X(1), Y(1), numPoints);
+    int N = numPoints * numPoints;
+    for (size_t i = 0; i < numPoints; i++) 
+        for (size_t j = 0; j < numPoints; j++)
         {
             ptsnD temp;
             temp.x[0] = Ydir[i];
@@ -56,19 +94,49 @@ int main()
             temp.id = cts++;
             gridPoints->push_back(temp);
         }
-    std::vector<int> v(25);                  // vector with 100 ints.
-    std::iota(std::begin(v), std::end(v), 0); // Fill with 0, 1, ..., 99.
+    std::vector<size_t> v1;                  // vector with 100 ints.
+    std::vector<size_t> v2;                  // vector with 100 ints.
+    for(size_t i=0;i<50;i++)
+        v1.push_back(i);
+    for (size_t i = 50; i < 100; i++)
+        v2.push_back(i);
+    //std::iota(std::begin(v1), std::end(v1), 0); // Fill with 0, 1, ..., 99.
+    
+    //std::iota(std::begin(v2), std::end(v2), 50); // Fill with 0, 1, ..., 99.
+    std::cout << "Grid_points A" << std::endl;
     cluster A(X,Y,gridPoints);
-    A.add_points(v);
+    A.add_points(v1);
+    std::cout << "Grid_points B" << std::endl;
+    cluster B(X, Y, gridPoints);
+    B.add_points(v2);
+    
+
     std::vector<cluster *> t;
     //A.print_cluster();
-    A.level_clustering(t);
-    //for(int i=0;i<t.size();i++)
-        //t[i]->print_cluster();
+    // A.level_clustering(t);
+    // for(int i=0;i<t.size();i++)
+    //     t[i]->print_cluster();
+    
     userkernel *add;
+    add = new userkernel();
     kernel_function<userkernel> *kernelfunc = new kernel_function<userkernel>(add);
-    std::cout << kernelfunc->getRow(2, 1, 10) << endl;
-    std::cout << kernelfunc->getCol(2, 1, 10) << endl;
+    HODLRdD_matrix Kmat = HODLRdD_matrix(add, gridPoints, X, Y);
+    std::cout << "row size " << add->getMatrixEntry(1,2) << std::endl;
+    //std::cout << kernelfunc->getRow(1, v2) << endl;
+    //std::cout << kernelfunc->getCol(1,v1) << endl;
+    Mat K,L,R;
+    Vec x, b, bl;
+    b = Vec::Zero(50);
+    x = Vec::Ones(50,1);
+    K = kernelfunc->getMatrix(v1,v2);
+    std::cout << K.rows() << "," << K.cols() << std::endl;
+    std::cout << x.size() << std::endl;
+
+    b = K*x;
+    kernelfunc->ACA_FAST(L,R,0.000001,v1,v2);
+    bl = L*(R.transpose()*x);
+    std::cout << "Relative Error.."<< Vec_ops::relative_error(b,bl) << std::endl;
+
 
     return 0;
     }
@@ -88,3 +156,29 @@ int main()
     cout << "2-norm .." << nd_points::euclidean_distance(A, B) << endl;
 
 */
+
+    /*  Interaction type of two boxes provided the center of the clusters
+        ptsnD c1,c2;
+        c1.x[0] = 0.5;
+        c1.x[1] = 0.5;
+        c1.x[2] = 0.5;
+        c2.x[0] = 2.5;
+        c2.x[1] = 1.5;
+        c2.x[2] = 1.5;
+        int tmp = INTERACTION_type(c1, c2, 1.0);
+        cout << "Interaction type .. "<< tmp << std::endl;
+
+int INTERACTION_type(ptsnD A, ptsnD B, double L)
+{
+    int type_sharing = NDIM;
+    // This ensures whether cluster |A|  |B| in the ith dimension image
+    double dp =  nd_points::euclidean_distance(A, B) / L;
+    dp *= dp;
+    //std::cout << "Frac : "<< dp <<std::endl;
+    if (double(NDIM)+1 > dp)
+        type_sharing -= std::round(dp);
+    else
+        type_sharing = -1;
+    return type_sharing;
+}
+    */

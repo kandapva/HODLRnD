@@ -11,6 +11,10 @@ struct ptsnD
     double x[NDIM];
     size_t id=-1; // User provides a unique identifier if not then kernel is defined by considering two points
 };
+void print_point(ptsnD& a){
+    for(int i=0;i<NDIM;i++)
+        std::cout << a.x[i] <<" " << std::endl;
+}
 namespace nd_points{
 // Computes the infinity norm of the |x-y| R^d -> R
 double max_norm_distance(ptsnD& a, ptsnD& b){

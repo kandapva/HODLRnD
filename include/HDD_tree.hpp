@@ -11,8 +11,8 @@ class Tree
 {
     size_t N;
     std::vector<ptsnD> *gridPoints;
-    std::vector<std::vector<Node *>> obj_arr;
-    Node *root;
+    std::vector<std::vector<Node<Kernel> *>> obj_arr;
+    Node<Kernel> *root;
     int level = 0;
     cluster *src;
 public:
@@ -22,8 +22,11 @@ public:
         this->gridPoints = gPoints;
         this->src = src_;
         int Nlevel = gridPoints->size();
-        std::vector<int> v(Nlevel);                  
-        std::iota(std::begin(v), std::end(v), 0); 
+        std::vector<size_t> v(Nlevel);
+        for (size_t i = 0; i < Nlevel; i++){
+            v[i] = i;
+        }
+        //    std::iota(std::begin(v), std::end(v), size_t(0)); 
         src->add_points(v);
         // create a root node
         root = new Node(src, usr_);
@@ -38,7 +41,8 @@ public:
                 std::vector<cluster *> t;
                 obj_arr[level][i]->my_cluster->level_clustering(t);
                 for(int j=0; j<t.size();j++){
-                    Node *temp = new Node(t[j], obj_arr[level][i], usr_);
+                    Node<Kernel> *temp;
+                    temp = new Node<Kernel>(t[j], obj_arr[level][i], usr_);
                     obj_arr[level+1].push_back(temp);
                 }
             }
