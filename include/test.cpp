@@ -55,11 +55,13 @@ public:
         }
     dtype_base getMatrixEntry(int i, int j){
         double r = 0.0;
+        if(i != j){
         ptsnD a,b;
         a = gridPoints[i];
         b = gridPoints[j];
         r = nd_points::euclidean_distance(a, b);
         r = 1/r;
+        }
         return r;
     }
 
@@ -73,7 +75,7 @@ int main()
     VectorXd Xdir, Ydir;
     std::vector<ptsnD> *gridPoints; // location of particles in the domain
     int numPoints = 10;
-    std::cout << "Cheb Points" << std::endl;
+    //std::cout << "Cheb Points" << std::endl;
     Eigen::VectorXd X(2), Y(2);
     X(0) = -1;
     X(1) = -1;
@@ -82,7 +84,7 @@ int main()
     gridPoints = new std::vector<ptsnD>; // location of particles in the domain
     int cts = 0;
     Xdir = cheb_nodes(X(0), Y(0), numPoints);
-    std::cout << Xdir << std::endl;
+    //std::cout << Xdir << std::endl;
     Ydir = cheb_nodes(X(1), Y(1), numPoints);
     int N = numPoints * numPoints;
     for (size_t i = 0; i < numPoints; i++) 
@@ -96,6 +98,7 @@ int main()
         }
     std::vector<size_t> v1;                  // vector with 100 ints.
     std::vector<size_t> v2;                  // vector with 100 ints.
+    std::vector<size_t> v3;
     for(size_t i=0;i<50;i++)
         v1.push_back(i);
     for (size_t i = 50; i < 100; i++)
@@ -121,13 +124,26 @@ int main()
     add = new userkernel();
     kernel_function<userkernel> *kernelfunc = new kernel_function<userkernel>(add);
     HODLRdD_matrix Kmat = HODLRdD_matrix(add, gridPoints, X, Y);
-    std::cout << "row size " << add->getMatrixEntry(1,2) << std::endl;
-    //std::cout << kernelfunc->getRow(1, v2) << endl;
-    //std::cout << kernelfunc->getCol(1,v1) << endl;
-    Mat K,L,R;
+    Kmat.Assemble_matrix_operators();
+    //std::cout << "Entry " << add->getMatrixEntry(1,2) << std::endl;
     Vec x, b, bl;
     b = Vec::Zero(50);
-    x = Vec::Ones(50,1);
+    x = Vec::Ones(50, 1);
+    Vec b1,b2,x_test;
+    x_test = Vec::Ones(100, 1);
+    std::cout << Kmat.get_size() << std::endl;
+    b1 = Kmat * x_test;
+    //std::cout << b1 << std::endl;
+    //std::cout << Kmat.get_size() << std::endl;
+    for (size_t i = 0; i < 100; i++)
+        v3.push_back(i);
+    b2 = kernelfunc->getMatrix(v3, v3) * x_test;
+    //std::cout << b2 << std::endl;
+    std::cout << "Relative Error.. hmatrix ... " << Vec_ops::relative_error(b2, b1) << std::endl;
+    // std::cout << kernelfunc->getRow(1, v2) << endl;
+    // std::cout << kernelfunc->getCol(1,v1) << endl;
+    Mat K,L, R;
+
     K = kernelfunc->getMatrix(v1,v2);
     std::cout << K.rows() << "," << K.cols() << std::endl;
     std::cout << x.size() << std::endl;
@@ -135,7 +151,7 @@ int main()
     b = K*x;
     kernelfunc->ACA_FAST(L,R,0.000001,v1,v2);
     bl = L*(R.transpose()*x);
-    std::cout << "Relative Error.."<< Vec_ops::relative_error(b,bl) << std::endl;
+    std::cout << "Relative Error (ACA).."<< Vec_ops::relative_error(b,bl) << std::endl;
 
 
     return 0;

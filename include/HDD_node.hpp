@@ -40,8 +40,9 @@ public:
     int n_neighbours, n_intraction;
     std::vector<Node<Kernel> *> my_intr_list_addr;
     // Node can be initialised with just parent and child information
-    Node(cluster *&src, kernel_function<Kernel>*& usr_)
+    Node(cluster*& src, kernel_function<Kernel>*& usr_)
     {
+        
         this->my_cluster = src;
         this->userkernel = usr_;
         n_neighbours = 0;
@@ -51,21 +52,28 @@ public:
         self_id = 0;
         this->my_cluster->compute_cluster_center(cluster_center);
         cluster_center.id = -1;
+        
     }
-    Node(cluster *&src, Node *&parent_, kernel_function<Kernel>*& usr_)
+    Node(cluster*& src, Node*& parent_, kernel_function<Kernel>*& usr_)
     {
+        this->my_cluster = src;
         this->parent = parent_;
         this->userkernel = usr_;
         n_neighbours = 0;
         n_intraction = 0;
         n_particles = src->get_cluster_size();
+        std::cout << "cluster size " << n_particles << std::endl;
         // Update child list of the parents
-        parent->Child.push_back(this);
+        //parent->Child.push_back(this);
         isroot = false;
         self_id = src->cluster_id;
-        this->my_cluster->compute_cluster_center(cluster_center);
+        my_cluster->compute_cluster_center(cluster_center);
         cluster_center.id = -1; // center points provided with id -1
     }
+    size_t get_id(){
+        return this->self_id;
+    }
+
     void Initialize_node();
     void get_interaction_list();
     void get_node_potential();
@@ -113,16 +121,19 @@ void Node<Kernel>::Initialize_node()
                                                    my_neighbour_addr[i]->my_cluster->index_of_points);
         }
     }
+    node_potential = Vec::Zero(n_particles);
     //TODO : Initialise the matrix operator - Reduced memory
 }
 template<class Kernel>
 void Node<Kernel>::get_interaction_list()
 {
+    std::cout << "Self--- " << self_id << std::endl;
     if(!isroot){
         // The interaction list consists of nodes from two sources
         //      1) Siblings
         for (int i = 0; i < this->parent->Child.size(); i++){
-            Node<Kernel> *tmp = this->parent->Child[i];
+            Node<Kernel>* tmp;
+            tmp = this->parent->Child[i];
             if (this->self_id != tmp->self_id){
                 if(this->is_admissible(tmp))
                     this->my_intr_list_addr.push_back(tmp);
@@ -133,7 +144,8 @@ void Node<Kernel>::get_interaction_list()
         //      2) Children of one's parent's neighbours
         for (int i = 0; i < this->parent->my_neighbour_addr.size(); i++){
             for (int j = 0; j < this->parent->my_neighbour_addr[i]->Child.size(); j++){
-                Node<Kernel> *tmp = this->parent->my_neighbour_addr[i]->Child[j];
+                Node<Kernel> *tmp;
+                tmp = this->parent->my_neighbour_addr[i]->Child[j];
                 if (this->is_admissible(tmp))
                     this->my_intr_list_addr.push_back(tmp);
                 else
@@ -142,23 +154,43 @@ void Node<Kernel>::get_interaction_list()
         }
     }
     this->n_neighbours = this->my_neighbour_addr.size();
+    std::cout << "Neighbours--- " << n_neighbours << std::endl;
+    for (int i = 0; i < n_neighbours; i++)
+        std::cout << " " << my_neighbour_addr[i]->self_id << std::endl; // 
     this->n_intraction = this->my_intr_list_addr.size();
-}
+    std::cout << "Interactions " << n_intraction << std::endl;
+    for (int i = 0; i < n_intraction; i++)
+        std::cout << this->my_intr_list_addr[i]->self_id << std::endl;
+    }
 
 template<class Kernel>
 void Node<Kernel>::get_node_potential(){
     // Routine for Full memory matvec
+    std::cout << "Self ID " << self_id << std::endl;
     if(isleaf){
         if(n_particles != 0){
+            std::cout << "(" << P2P_self.rows() << "," << P2P_self.cols() <<") x ("<< node_charge.size() << "x1)" << std::endl;
             node_potential += P2P_self * node_charge;
+            std::cout << "Neighbor id ";
             for (int i = 0; i < n_neighbours; i++)
+            {
+                std::cout  << my_neighbour_addr[i]->self_id << " " << std::endl;
                 if (my_neighbour_addr[i]->n_particles != 0)
                     node_potential += P2P[i] * my_neighbour_addr[i]->node_charge;
+            }
+            std::cout << "Neighbor id ";
         }
     }
+    std::cout << std::endl;
+    std::cout << "Interaction  id " ;
     for (int i = 0; i < n_intraction; i++)
+    {
+        std::cout << my_intr_list_addr[i]->self_id << " ";
         if (my_intr_list_addr[i]->n_particles != 0)
-            node_potential += (L2P[i] * (P2M[i].transpose() * my_neighbour_addr[i]->node_charge));
+            node_potential += (L2P[i] * (P2M[i].transpose() * my_intr_list_addr[i]->node_charge));
+        }
+    std::cout << std::endl;
+
     // TODO : Routine Reduced memory matvec
 }
 #endif

@@ -9,7 +9,6 @@ class cluster
 {
     size_t N;
     std::vector<ptsnD> *gridPoints;
-    double x1[NDIM], x2[NDIM];
     double diam;
     double L;
     int level; // This is the level in the hierarchical clustering
@@ -19,21 +18,24 @@ class cluster
 public:
     size_t cluster_id;
     std::vector<size_t> index_of_points;
-    cluster(Eigen::VectorXd x1, Eigen::VectorXd x2,  std::vector<ptsnD>* gPoints)
+    double x1[NDIM], x2[NDIM];
+    cluster(Eigen::VectorXd& x1_, Eigen::VectorXd& x2_,  std::vector<ptsnD>*& gPoints)
     {
         N = 0;
         this->gridPoints = gPoints;
         diam = 0.0;
-        L = abs(this->x1[0] - this->x2[0]);
+        L = abs(x1_(0) - x2_(0));
         // TODO : Optimize copy
         for (int i = 0; i < NDIM; i++)
         {
-            this->x1[i] = x1(i);
-            this->x2[i] = x2(i);
+            this->x1[i] = x1_(i);
+            this->x2[i] = x2_(i);
             if (abs(this->x1[i] - this->x2[i]) > L)
                 L = abs(this->x1[i] - this->x2[i]);
-            diam += (x1(i) - x2(i)) * (x1(i) - x2(i));
+            diam += (x1_(i) - x2_(i)) * (x1_(i) - x2_(i));
+            std::cout << "[" << this->x1[i] << "," << this->x2[i] << "] "; 
         }
+        std::cout << std::endl;
         diam = sqrt(diam);
         cluster_id = 0;
     }
@@ -56,61 +58,66 @@ public:
     }
     void compute_cluster_center(ptsnD& c){
         // Compute cluster center
-        for (int i = 0; i < NDIM; i++)
-            c.x[i] = 0.5 * (x1[i] + x2[i]);
+        //std::cout << "cluster center.."<<std::endl;
+        for (int i = 0; i < NDIM; i++){
+            //std::cout << "c.." << this->x1[i] << std::endl;
+            //std::cout << "c.." << this->x2[i] << std::endl;
+            c.x[i] = 0.5 * (this->x1[i] + this->x2[i]);
+        }
+        //std::cout << "cluster center computed.."<<std::endl;
     }
-    void level_clustering(std::vector<cluster *>& h_clusters){
-        h_clusters.push_back(this);
+    void level_clustering(std::vector<cluster *>*& h_clusters){
+        h_clusters->push_back(this);
         // Form 2^NDIM empty cluster by initialising through the bounding box of the parent
         for (int i = 0; i < NDIM; i++)
         {
             binary_clustering(h_clusters, i);
-            std::cout << i << " " << h_clusters.size() << std::endl;
+            //std::cout << i << " " << h_clusters->size() << std::endl;
         }
     }
-    void binary_clustering(std::vector<cluster *>& binary_clusters, int dim_i)
+    void binary_clustering(std::vector<cluster *>*& binary_clusters, int dim_i)
     {
-        size_t n = binary_clusters.size();
+        size_t n = binary_clusters->size();
         for (size_t i = 0; i < n; i++)
         {
             // Calculate boundary bdy
             double bdy = 0.0;
-            double a = binary_clusters[0]->x1[dim_i];
-            double b = binary_clusters[0]->x2[dim_i];
+            double a = binary_clusters->at(0)->x1[dim_i];
+            double b = binary_clusters->at(0)->x2[dim_i];
             bdy += 0.5 * (a + b);
             Eigen::VectorXd x1 = Eigen::VectorXd::Zero(NDIM);
             Eigen::VectorXd x2 = Eigen::VectorXd::Zero(NDIM);
             // Create the bounding box [x_1,x_2]^NDIM for the cluster
             for (int k = 0; k < NDIM; k++)
             {
-                x1(k) = binary_clusters[0]->x1[k];
-                x2(k) = binary_clusters[0]->x2[k];
+                x1(k) = binary_clusters->at(0)->x1[k];
+                x2(k) = binary_clusters->at(0)->x2[k];
             }
             // Create two clusters!! this subdivide the particles two ways TODO : HPC way<>
             x2(dim_i) = bdy;
             cluster *A, *B;
             A = new cluster(x1, x2, gridPoints);
             // Assigning cluster id = parent*2 in binary subdivision
-            A->cluster_id = binary_clusters[0]->cluster_id * 2;
+            A->cluster_id = binary_clusters->at(0)->cluster_id * 2;
             x1(dim_i) = bdy;
             x2(dim_i) = b;
             B = new cluster(x1, x2, gridPoints);
             // Assigning cluster id = parent*2+1 in binary subdivision (this holds being the binary division of the domain)
-            B->cluster_id = binary_clusters[0]->cluster_id * 2 + 1;
+            B->cluster_id = binary_clusters->at(0)->cluster_id * 2 + 1;
 
             // Here goes a while loop to subdivide the points in one dimension at the same time remove from source This ensure O(N) space for points at all times...
-            for (int k = 0; k < binary_clusters[0]->get_cluster_size(); k++)
+            for (int k = 0; k < binary_clusters->at(0)->get_cluster_size(); k++)
             {
-                int point_i = binary_clusters[0]->index_of_points[k];
+                int point_i = binary_clusters->at(0)->index_of_points[k];
                 // TODO : Use toggle to place the points inside the cluster A and B if it lies in the boundary
                 if (gridPoints->at(point_i).x[dim_i] < bdy)
                     A->add_point(point_i);
                 else
                     B->add_point(point_i);
             }
-            binary_clusters.erase(binary_clusters.begin());
-            binary_clusters.push_back(A);
-            binary_clusters.push_back(B);
+            binary_clusters->erase(binary_clusters->begin());
+            binary_clusters->push_back(A);
+            binary_clusters->push_back(B);
         }
     }
     double box_length(){

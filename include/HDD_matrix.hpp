@@ -18,7 +18,8 @@ public:
     // Constructor for the matrix data structure. Also, x1 and x2 is the bounding box of the cluster of points 
     HODLRdD_matrix(Kernel*& userkernel, std::vector<ptsnD>*& gPoints, Eigen::VectorXd x1, Eigen::VectorXd x2)
     {
-        this->kernel_func = new kernel_function(userkernel);
+        std::cout << "HMATRIX START" << std::endl;
+        this->kernel_func = new kernel_function<Kernel>(userkernel);
         this->gridPoints = gPoints;
         N = gPoints->size();
         // Source cluster needs special treatment i.e., provide a guide list that maps the points
@@ -27,6 +28,7 @@ public:
         // This initialises the grid points, this creates the hierarchical tre
         // Initialize the hierarchical 2^d tree
         HODLRdD_tree = new Tree<Kernel>(src, gPoints, kernel_func);
+        std::cout<< "HMATRIX DONE" << std::endl; 
     }
     // Size of the matrix
     size_t get_size(){
@@ -37,9 +39,9 @@ public:
         HODLRdD_tree->Initialise_tree();
     }
     // mat-vec product or mat-mat product
-    Vec operator*(Vec x)
+    Vec operator * (Vec x)
     {
-        Vec b = HODLRdD_tree->matvec(x);
+        Vec b = HODLRdD_tree->mat_vec(x);
         return b;
     }
 
