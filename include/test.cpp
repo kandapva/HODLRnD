@@ -6,9 +6,9 @@
 #include "kernel_function.hpp"
 #include "myHeaders.hpp"
 #include "points_dt.hpp"
+#include "LowRank_matrix.hpp"
 
-    using namespace std;
-
+using namespace std;
 
 Eigen::VectorXd cheb_nodes(double a, double b, int n)
 {
@@ -145,15 +145,17 @@ int main()
     Mat K,L, R;
 
     K = kernelfunc->getMatrix(v1,v2);
+    LowRankMat<userkernel> LR(kernelfunc, v1, v2, true);
+    bl = LR * x;
     std::cout << K.rows() << "," << K.cols() << std::endl;
     std::cout << x.size() << std::endl;
 
     b = K*x;
+    std::cout << "Rank of ACA.. " << LR.rank() << std::endl;
+    std::cout << "Relative Error (ACA).." << Vec_ops::relative_error(b, bl) << std::endl;
     kernelfunc->ACA_FAST(L,R,0.000001,v1,v2);
     bl = L*(R.transpose()*x);
     std::cout << "Relative Error (ACA).."<< Vec_ops::relative_error(b,bl) << std::endl;
-
-
     return 0;
     }
 

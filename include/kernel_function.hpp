@@ -4,6 +4,7 @@
 #include "myHeaders.hpp"
 #include "points_dt.hpp"
 
+
 template <class Operator>
 class kernel_function
 {
@@ -51,8 +52,8 @@ Mat getMatrix(std::vector<size_t> &sources, std::vector<size_t> &targets){
     return mat;
 }
 
-void maxAbsVector(const Vec &v, const std::set<int> &allowed_indices, dtype &max, int &index){
-    std::set<int>::iterator it;
+void maxAbsVector(const Vec &v, const std::set<size_t> &allowed_indices, dtype &max, size_t &index){
+    std::set<size_t>::iterator it;
     index = *allowed_indices.begin();
     max = v(index);
 
@@ -73,12 +74,12 @@ void ACA_FAST(Mat &L, Mat &R,
     int n_cols = targets.size();
 
     // Indices which have been used:
-    std::vector<int> row_ind;
-    std::vector<int> col_ind;
+    std::vector<size_t> row_ind;
+    std::vector<size_t> col_ind;
 
     // Indices that are remaining:
-    std::set<int> remaining_row_ind;
-    std::set<int> remaining_col_ind;
+    std::set<size_t> remaining_row_ind;
+    std::set<size_t> remaining_col_ind;
 
     // Bases:
     std::vector<Vec> u;
@@ -102,7 +103,7 @@ void ACA_FAST(Mat &L, Mat &R,
     remaining_row_ind.erase(0);
 
     // Stores the pivot entry of the considered row / col:
-    int pivot;
+    size_t pivot;
 
     int target_rank = 0;
     // This would get updated:
@@ -176,16 +177,16 @@ void ACA_FAST(Mat &L, Mat &R,
             {
                 if (use_randomization == true)
                 {
-                    std::set<int>::const_iterator it(remaining_row_ind.begin());
+                    std::set<size_t>::const_iterator it(remaining_row_ind.begin());
                     std::advance(it, rand() % remaining_row_ind.size());
                     new_row_ind = *it;
                 }
 
                 else
                 {
-                    std::vector<int> row_ind_sort(row_ind);
+                    std::vector<size_t> row_ind_sort(row_ind);
                     std::sort(row_ind_sort.begin(), row_ind_sort.end());
-                    std::vector<int> row_ind_diff(row_ind_sort.size() - 1);
+                    std::vector<size_t> row_ind_diff(row_ind_sort.size() - 1);
 
                     int max = 0;
                     int idx = 0;
@@ -275,16 +276,16 @@ void ACA_FAST(Mat &L, Mat &R,
             {
                 if (use_randomization == true)
                 {
-                    std::set<int>::const_iterator it(remaining_col_ind.begin());
+                    std::set<size_t>::const_iterator it(remaining_col_ind.begin());
                     std::advance(it, rand() % remaining_col_ind.size());
                     new_col_ind = *it;
                 }
 
                 else
                 {
-                    std::vector<int> col_ind_sort(col_ind);
+                    std::vector<size_t> col_ind_sort(col_ind);
                     std::sort(col_ind_sort.begin(), col_ind_sort.end());
-                    std::vector<int> col_ind_diff(col_ind_sort.size() - 1);
+                    std::vector<size_t> col_ind_diff(col_ind_sort.size() - 1);
 
                     int max = 0;
                     int idx = 0;
@@ -381,8 +382,9 @@ void ACA_FAST(Mat &L, Mat &R,
     }
 }
 // Like HODLR library it has the assemble feature that either constructs all 
-// the matrix operators or just an memory efficient way 
- ~kernel_function(){
+// the matrix operators or just an memory efficient way
+~kernel_function()
+{
     // Destructor
 }
 };
