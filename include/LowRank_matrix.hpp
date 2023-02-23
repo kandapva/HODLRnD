@@ -15,6 +15,8 @@ class LowRankMat
     std::vector<size_t> col_basis;
     kernel_function<Kernel> *userkernel;
 public:
+    LowRankMat(){
+    }
     LowRankMat(kernel_function<Kernel> *&usr_, std::vector<size_t> &sources, std::vector<size_t> &targets,bool mem=false)
     {
         this->userkernel = usr_;

@@ -4,6 +4,7 @@
 #include "myHeaders.hpp"
 #include "kernel_function.hpp"
 #include "HDD_tree.hpp"
+#include "GMRES.hpp"
 
 // TODO : Rectangular matrix structure ??
 template <class Kernel>
@@ -49,6 +50,11 @@ public:
     // solve using GMRES
     Vec solve(const Vec& b){
         Vec x = Vec::Zero(b.size());
+        x += b;
+        HODLRdD_matrix<Kernel>* mat_obj;
+        mat_obj = this;
+        iterSolver<HODLRdD_matrix<Kernel> > solve_obj(100, N, eps_ACA);
+        int k = solve_obj.GMRES(mat_obj, x, b);
         // Routine to compute the GMRES iterations
         return x;
     }

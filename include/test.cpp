@@ -1,5 +1,5 @@
 #include<iostream>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 #include "HDD_matrix.hpp"
 #include "HDD_clusters.hpp"

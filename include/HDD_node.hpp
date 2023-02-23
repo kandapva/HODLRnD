@@ -5,6 +5,7 @@
 #include "points_dt.hpp"
 #include "HDD_clusters.hpp"
 #include "kernel_function.hpp"
+#include "LowRank_matrix.hpp"
 
 template <class Kernel>
 class Node
@@ -15,6 +16,7 @@ class Node
     // Matrix operators ... Full memory
     Mat P2P_self;
     Mat *P2P, *P2M, *L2P;
+    LowRankMat<Kernel> *LR;
     Vec node_charge;
     Vec node_potential;
     // Matrix operators ... reduced memory
@@ -42,7 +44,6 @@ public:
     // Node can be initialised with just parent and child information
     Node(cluster*& src, kernel_function<Kernel>*& usr_)
     {
-        
         this->my_cluster = src;
         this->userkernel = usr_;
         n_neighbours = 0;
@@ -51,8 +52,7 @@ public:
         isroot = true;
         self_id = 0;
         this->my_cluster->compute_cluster_center(cluster_center);
-        cluster_center.id = -1;
-        
+        cluster_center.id = -1; 
     }
     Node(cluster*& src, Node*& parent_, kernel_function<Kernel>*& usr_)
     {
@@ -106,11 +106,16 @@ void Node<Kernel>::Initialize_node()
         node_charge = Vec::Zero(n_particles);
         L2P = new Mat[n_intraction];
         P2M = new Mat[n_intraction];
+        LR = new LowRankMat<Kernel>[n_intraction];
         for (int i = 0; i < n_intraction; i++)
             if (my_intr_list_addr[i]->n_particles != 0)
+                LR[i] = LowRankMat<Kernel>(userkernel, my_cluster->index_of_points,
+                                               my_intr_list_addr[i]->my_cluster->index_of_points);
+        for (int i = 0; i < n_intraction; i++) 
+            if (my_intr_list_addr[i]->n_particles != 0)
                 userkernel->ACA_FAST(L2P[i], P2M[i], eps_ACA,
-                                     my_cluster->index_of_points,
-                                     my_intr_list_addr[i]->my_cluster->index_of_points);
+                                                 my_cluster->index_of_points,
+                                                 my_intr_list_addr[i]->my_cluster->index_of_points);
         if (isleaf)
         {
             P2P = new Mat[n_neighbours];
@@ -188,6 +193,8 @@ void Node<Kernel>::get_node_potential(){
         std::cout << my_intr_list_addr[i]->self_id << " ";
         if (my_intr_list_addr[i]->n_particles != 0)
             node_potential += (L2P[i] * (P2M[i].transpose() * my_intr_list_addr[i]->node_charge));
+        if (my_intr_list_addr[i]->n_particles != 0)
+            Vec tmp_node_potential = LR[i] * my_intr_list_addr[i]->node_charge;
         }
     std::cout << std::endl;
 
