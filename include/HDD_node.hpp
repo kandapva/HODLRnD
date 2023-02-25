@@ -111,11 +111,11 @@ void Node<Kernel>::Initialize_node()
             if (my_intr_list_addr[i]->n_particles != 0)
                 LR[i] = LowRankMat<Kernel>(userkernel, my_cluster->index_of_points,
                                                my_intr_list_addr[i]->my_cluster->index_of_points);
-        for (int i = 0; i < n_intraction; i++) 
-            if (my_intr_list_addr[i]->n_particles != 0)
-                userkernel->ACA_FAST(L2P[i], P2M[i], eps_ACA,
-                                                 my_cluster->index_of_points,
-                                                 my_intr_list_addr[i]->my_cluster->index_of_points);
+        // for (int i = 0; i < n_intraction; i++) 
+        //     if (my_intr_list_addr[i]->n_particles != 0)
+        //         userkernel->ACA_FAST(L2P[i], P2M[i], eps_ACA,
+        //                                          my_cluster->index_of_points,
+        //                                          my_intr_list_addr[i]->my_cluster->index_of_points);
         if (isleaf)
         {
             P2P = new Mat[n_neighbours];
@@ -136,7 +136,7 @@ void Node<Kernel>::get_interaction_list()
     if(!isroot){
         // The interaction list consists of nodes from two sources
         //      1) Siblings
-        for (int i = 0; i < this->parent->Child.size(); i++){
+        for (size_t i = 0; i < this->parent->Child.size(); i++){
             Node<Kernel>* tmp;
             tmp = this->parent->Child[i];
             if (this->self_id != tmp->self_id){
@@ -147,8 +147,8 @@ void Node<Kernel>::get_interaction_list()
             }
         }
         //      2) Children of one's parent's neighbours
-        for (int i = 0; i < this->parent->my_neighbour_addr.size(); i++){
-            for (int j = 0; j < this->parent->my_neighbour_addr[i]->Child.size(); j++){
+        for (size_t i = 0; i < this->parent->my_neighbour_addr.size(); i++){
+            for (size_t j = 0; j < this->parent->my_neighbour_addr[i]->Child.size(); j++){
                 Node<Kernel> *tmp;
                 tmp = this->parent->my_neighbour_addr[i]->Child[j];
                 if (this->is_admissible(tmp))
@@ -191,10 +191,10 @@ void Node<Kernel>::get_node_potential(){
     for (int i = 0; i < n_intraction; i++)
     {
         std::cout << my_intr_list_addr[i]->self_id << " ";
+        // if (my_intr_list_addr[i]->n_particles != 0)
+        //     node_potential += (L2P[i] * (P2M[i].transpose() * my_intr_list_addr[i]->node_charge));
         if (my_intr_list_addr[i]->n_particles != 0)
-            node_potential += (L2P[i] * (P2M[i].transpose() * my_intr_list_addr[i]->node_charge));
-        if (my_intr_list_addr[i]->n_particles != 0)
-            Vec tmp_node_potential = LR[i] * my_intr_list_addr[i]->node_charge;
+            node_potential += LR[i] * my_intr_list_addr[i]->node_charge;
         }
     std::cout << std::endl;
 

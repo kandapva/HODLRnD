@@ -106,7 +106,7 @@ public:
             B->cluster_id = binary_clusters->at(0)->cluster_id * 2 + 1;
 
             // Here goes a while loop to subdivide the points in one dimension at the same time remove from source This ensure O(N) space for points at all times...
-            for (int k = 0; k < binary_clusters->at(0)->get_cluster_size(); k++)
+            for (size_t k = 0; k < binary_clusters->at(0)->get_cluster_size(); k++)
             {
                 int point_i = binary_clusters->at(0)->index_of_points[k];
                 // TODO : Use toggle to place the points inside the cluster A and B if it lies in the boundary
