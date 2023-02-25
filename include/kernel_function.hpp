@@ -191,10 +191,10 @@ void ACA_FAST(Mat &L, Mat &R,
                     int max = 0;
                     int idx = 0;
 
-                    for (int i = 0; i < row_ind_sort.size() - 1; i++)
+                    for (size_t i = 0; i < row_ind_sort.size() - 1; i++)
                     {
                         row_ind_diff[i] = row_ind_sort[i + 1] - row_ind_sort[i];
-                        if (row_ind_diff[i] > max)
+                        if (row_ind_diff[i] > (unsigned) max)
                         {
                             idx = i;
                             max = row_ind_diff[i];
@@ -290,10 +290,10 @@ void ACA_FAST(Mat &L, Mat &R,
                     int max = 0;
                     int idx = 0;
 
-                    for (int i = 0; i < col_ind_sort.size() - 1; i++)
+                    for (size_t i = 0; i < col_ind_sort.size() - 1; i++)
                     {
                         col_ind_diff[i] = col_ind_sort[i + 1] - col_ind_sort[i];
-                        if (col_ind_diff[i] > max)
+                        if (col_ind_diff[i] > (unsigned) max)
                         {
                             idx = i;
                             max = col_ind_diff[i];

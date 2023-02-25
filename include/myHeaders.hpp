@@ -20,33 +20,38 @@
 #include <stack>
 
 #define _USE_MATH_DEFINES
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Sparse>
 
 using std::string;
 using namespace Eigen;
 
+/////////////////////////////////////////////////////////////
 // HODLR matrix parameters
 const int NDIM = 2;
 const int Nmax = 50;
-const int SYS_SIZE = 100;
+const int numPoints = 10;
 // The admissibility is based on the max norm of the center
 const int INTERACTION_TYPE_ALLOWED = 1; // This represents d'
 const double eps_ACA = pow(10,-6);
+const int SYS_SIZE = (int) pow(numPoints,NDIM);
+const int N = pow(numPoints,NDIM);
+
+/////////////////////////////////////////////////////////////
 
 int mod(int a, int b){
     return ((a % b + b) % b);
 }
 
-#ifdef USE_FLOAT
-    using dtype = float;
-    using dtype_base = float;
-    using Mat = Eigen::MatrixXf;
-    using Vec = Eigen::VectorXf;
-    #define Calc_dist(x1, y1, x2, y2) float(sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)))
-#endif
+// #ifdef USE_FLOAT
+//     using dtype = float;
+//     using dtype_base = float;
+//     using Mat = Eigen::MatrixXf;
+//     using Vec = Eigen::VectorXf;
+//     #define Calc_dist(x1, y1, x2, y2) float(sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)))
+// #endif
 
-#ifdef USE_DOUBLE
+// #ifdef USE_DOUBLE
     using dtype = double;
     using dtype_base = double;
     using Mat = Eigen::MatrixXd;
@@ -54,26 +59,41 @@ int mod(int a, int b){
     #define abs_(x) ((x < 0) ? (-x) : (x))
     #define conj_(x) (x)
     #define Calc_dist(x1, y1, x2, y2) double(sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)))
-#endif
+// #endif
 
-#ifdef USE_COMPLEX32
-    using dtype = std::complex<float>;
-    using dtype_base = float;
-    using Mat = Eigen::MatrixXcf;
-    using Vec = Eigen::VectorXcf;
-    const std::complex<float> I(0.0, 1.0);
-#endif
+// #ifdef USE_COMPLEX32
+//     using dtype = std::complex<float>;
+//     using dtype_base = float;
+//     using Mat = Eigen::MatrixXcf;
+//     using Vec = Eigen::VectorXcf;
+//     const std::complex<float> I(0.0, 1.0);
+// #endif
 
-#ifdef USE_COMPLEX64
-    using dtype = std::complex<double>;
-    using dtype_base = double;
-    using Mat = Eigen::MatrixXcd;
-    using Vec = Eigen::VectorXcd;
-    #define abs_(x) (std::abs((x)))
-    #define conj_(x) (std::conj((x)))
-    const std::complex<double> I(0.0, 1.0);
-    #define Calc_dist(x1, y1, x2, y2) float(sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)))
-#endif
+// #ifdef USE_COMPLEX64
+//     using dtype = std::complex<double>;
+//     using dtype_base = double;
+//     using Mat = Eigen::MatrixXcd;
+//     using Vec = Eigen::VectorXcd;
+//     #define abs_(x) (std::abs((x)))
+//     #define conj_(x) (std::conj((x)))
+//     const std::complex<double> I(0.0, 1.0);
+//     #define Calc_dist(x1, y1, x2, y2) float(sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)))
+// #endif
+
+Eigen::VectorXd cheb_nodes(double a, double b, int n)
+{
+    Eigen::VectorXd X(n);
+    double l, l1, param;
+    l = 0.5 * (a + b);
+    l1 = 0.5 * (b - a);
+    for (int k = 0; k < n; k++)
+    {
+        param = (double)(k + 0.5) / n;
+        X(k) = l - l1 * cos(param * 3.1412);
+    }
+    return X;
+}
+
 
 std::string inline getTimeStamp()
 {
@@ -93,7 +113,7 @@ namespace Vec_ops
     dtype inline dot_product(const Vec &x, const Vec &y)
     {
         dtype tmp = dtype(0.0);
-        for (size_t i = 0; i < x.size(); i++)
+        for (int i = 0; i < x.size(); i++)
             tmp += x(i) * y(i);
         return tmp;
     }

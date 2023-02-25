@@ -177,10 +177,10 @@ public:
                         int max = 0;
                         int idx = 0;
 
-                        for (int i = 0; i < row_ind_sort.size() - 1; i++)
+                        for (size_t i = 0; i < row_ind_sort.size() - 1; i++)
                         {
                             row_ind_diff[i] = row_ind_sort[i + 1] - row_ind_sort[i];
-                            if (row_ind_diff[i] > max)
+                            if (row_ind_diff[i] > (unsigned) max)
                             {
                                 idx = i;
                                 max = row_ind_diff[i];
@@ -276,10 +276,10 @@ public:
                         int max = 0;
                         int idx = 0;
 
-                        for (int i = 0; i < col_ind_sort.size() - 1; i++)
+                        for (size_t i = 0; i < col_ind_sort.size() - 1; i++)
                         {
                             col_ind_diff[i] = col_ind_sort[i + 1] - col_ind_sort[i];
-                            if (col_ind_diff[i] > max)
+                            if (col_ind_diff[i] > (unsigned) max)
                             {
                                 idx = i;
                                 max = col_ind_diff[i];
@@ -493,10 +493,10 @@ public:
                         int max = 0;
                         int idx = 0;
 
-                        for (int i = 0; i < row_ind_sort.size() - 1; i++)
+                        for (size_t i = 0; i < row_ind_sort.size() - 1; i++)
                         {
                             row_ind_diff[i] = row_ind_sort[i + 1] - row_ind_sort[i];
-                            if (row_ind_diff[i] > max)
+                            if (row_ind_diff[i] > (unsigned) max)
                             {
                                 idx = i;
                                 max = row_ind_diff[i];
@@ -592,10 +592,10 @@ public:
                         int max = 0;
                         int idx = 0;
 
-                        for (int i = 0; i < col_ind_sort.size() - 1; i++)
+                        for (size_t i = 0; i < col_ind_sort.size() - 1; i++)
                         {
                             col_ind_diff[i] = col_ind_sort[i + 1] - col_ind_sort[i];
-                            if (col_ind_diff[i] > max)
+                            if (col_ind_diff[i] > (unsigned) max)
                             {
                                 idx = i;
                                 max = col_ind_diff[i];
@@ -684,23 +684,23 @@ public:
             R = Mat::Zero(computed_rank, computed_rank);
             if (computed_rank > 0)
             {
-                for (size_t i = 0; i < computed_rank; i++)
+                for (int i = 0; i < computed_rank; i++)
                 {
                     L(i, i) = 1.0;
                     if (i >= 1)
                     {
-                        for (size_t j = 0; j <= i - 1; j++)
+                        for (int j = 0; j <= i - 1; j++)
                         {
                             L(i, j) = u[j](row_ind[i]);
                         }
                     }
                 }
-                for (size_t i = 0; i < computed_rank; i++)
+                for (int i = 0; i < computed_rank; i++)
                 {
                     R(i, i) = v[i](col_ind[i]);
                     if (i >= 1)
                     {
-                        for (size_t j = 0; j <= i - 1; j++)
+                        for (int j = 0; j <= i - 1; j++)
                         {
                             R(j, i) = v[j](col_ind[i]);
                         }

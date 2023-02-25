@@ -24,7 +24,7 @@ public:
         int Nlevel = gridPoints->size();
         std::cout << Nlevel << std::endl;
         std::vector<size_t> v(Nlevel);
-        for (size_t i = 0; i < Nlevel; i++){
+        for (int i = 0; i < Nlevel; i++){
             v[i] = i;
         }
         level = 0;
@@ -46,7 +46,7 @@ public:
                 t = new std::vector<cluster *>;
                 obj_arr[level-1][i]->my_cluster->level_clustering(t);
                 std::cout << "Cluster recieved" << std::endl;
-                for(int j=0; j<t->size();j++){
+                for(size_t j=0; j<t->size();j++){
                     Node<Kernel> *temp;
                     temp = new Node<Kernel>(t->at(j), obj_arr[level-1][i], usr_);
                     obj_arr[level].push_back(temp);
@@ -59,7 +59,7 @@ public:
             Nlevel = obj_arr[level][0]->n_particles; 
             for (size_t j = 0; j < obj_arr[level].size(); j++) {
                 obj_arr[level][j]->get_interaction_list();
-                if (obj_arr[level][j]->n_particles > Nlevel)
+                if (obj_arr[level][j]->n_particles > (unsigned) Nlevel)
                     Nlevel = obj_arr[level][j]->n_particles;
             }
             level++;
