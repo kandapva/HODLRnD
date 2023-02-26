@@ -48,7 +48,7 @@ public:
 
     // Assemble the operators and access to the Tree structure
     // solve using GMRES
-    Vec solve(const Vec& b){
+    Vec solve(Vec& b){
         Vec x = Vec::Zero(b.size());
         x += b;
         HODLRdD_matrix<Kernel>* mat_obj;
