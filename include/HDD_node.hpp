@@ -163,7 +163,7 @@ void Node<Kernel>::get_interaction_list()
     for (int i = 0; i < n_neighbours; i++)
         std::cout << " " << my_neighbour_addr[i]->self_id << std::endl; // 
     this->n_intraction = this->my_intr_list_addr.size();
-    std::cout << "Interactions " << n_intraction << std::endl;
+    std::cout << "Interactions~~~ " << n_intraction << std::endl;
     for (int i = 0; i < n_intraction; i++)
         std::cout << this->my_intr_list_addr[i]->self_id << std::endl;
     }

@@ -28,11 +28,11 @@ using namespace Eigen;
 
 /////////////////////////////////////////////////////////////
 // HODLR matrix parameters
-const int NDIM = 2;
+const int NDIM = 4;
 const int Nmax = 50;
-const int numPoints = 10;
+const int numPoints = 10;         // Along 1D
 // The admissibility is based on the max norm of the center
-const int INTERACTION_TYPE_ALLOWED = 1; // This represents d'
+const int INTERACTION_TYPE_ALLOWED = 0; // This represents d'
 const double eps_ACA = pow(10,-6);
 const int SYS_SIZE = (int) pow(numPoints,NDIM);
 const int N = pow(numPoints,NDIM);
@@ -80,6 +80,8 @@ int mod(int a, int b){
 //     #define Calc_dist(x1, y1, x2, y2) float(sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)))
 // #endif
 
+
+// Cheb nodes
 Eigen::VectorXd cheb_nodes(double a, double b, int n)
 {
     Eigen::VectorXd X(n);
@@ -94,6 +96,17 @@ Eigen::VectorXd cheb_nodes(double a, double b, int n)
     return X;
 }
 
+// Uniform nodes
+Eigen::VectorXd uniform_nodes(double a, double b, int n)
+{
+    Eigen::VectorXd X(n);
+    double l = (b-a);
+    for (int k = 0; k < n; k++)
+    {
+        X(k) = a + l/(double) (n-1) * k;
+    }
+    return X;
+}
 
 std::string inline getTimeStamp()
 {
