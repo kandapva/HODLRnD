@@ -29,7 +29,7 @@ using namespace Eigen;
 /////////////////////////////////////////////////////////////
 // HODLR matrix parameters
 const int NDIM = 4;
-const int Nmax = 50;
+const int Nmax = 5000;
 const int numPoints = 10;         // Along 1D
 // The admissibility is based on the max norm of the center
 const int INTERACTION_TYPE_ALLOWED = 0; // This represents d'

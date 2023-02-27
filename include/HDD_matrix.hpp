@@ -54,6 +54,7 @@ public:
         HODLRdD_matrix<Kernel>* mat_obj;
         mat_obj = this;
         iterSolver<HODLRdD_matrix<Kernel> > solve_obj(100, N, eps_ACA);
+        solve_obj.set_output_file("gmres_out.txt");
         int k = solve_obj.GMRES(mat_obj, x, b);
         // Routine to compute the GMRES iterations
         return x;

@@ -171,23 +171,23 @@ void Node<Kernel>::get_interaction_list()
 template<class Kernel>
 void Node<Kernel>::get_node_potential(){
     // Routine for Full memory matvec
-    std::cout << "Self ID " << self_id << std::endl;
+    //std::cout << "Self ID " << self_id << std::endl;
     if(isleaf){
         if(n_particles != 0){
-            std::cout << "(" << P2P_self.rows() << "," << P2P_self.cols() <<") x ("<< node_charge.size() << "x1)" << std::endl;
+            //std::cout << "(" << P2P_self.rows() << "," << P2P_self.cols() <<") x ("<< node_charge.size() << "x1)" << std::endl;
             node_potential += P2P_self * node_charge;
-            std::cout << "Neighbor id ";
+            //std::cout << "Neighbor id ";
             for (int i = 0; i < n_neighbours; i++)
             {
                 std::cout  << my_neighbour_addr[i]->self_id << " " << std::endl;
                 if (my_neighbour_addr[i]->n_particles != 0)
                     node_potential += P2P[i] * my_neighbour_addr[i]->node_charge;
             }
-            std::cout << "Neighbor id ";
+            //std::cout << "Neighbor id ";
         }
     }
-    std::cout << std::endl;
-    std::cout << "Interaction  id " ;
+    //std::cout << std::endl;
+    //std::cout << "Interaction  id " ;
     for (int i = 0; i < n_intraction; i++)
     {
         std::cout << my_intr_list_addr[i]->self_id << " ";

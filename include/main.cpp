@@ -58,7 +58,7 @@ public:
 
             a[0] = 0, a[1] = 0, a[2] = 0, a[3] = 0;
             b[0] = h*0.5, b[1] = h*0.5, b[2] = h*0.5, b[3] = h*0.5;
-            r = quadruple_integral(a,b);         // Second kind
+            r = 1.0 +  quadruple_integral(a,b);         // Second kind
 
         }
         else{
@@ -107,11 +107,11 @@ int main()
     std::vector<size_t> v1;                  // vector with 100 ints.
     std::vector<size_t> v2;                  // vector with 100 ints.
     std::vector<size_t> v3;
-    for(int i=0;i<50;i++)
-        v1.push_back(i);
-    for (int i = 50; i < 100; i++)
-        v2.push_back(i);
-    //std::iota(std::begin(v1), std::end(v1), 0); // Fill with 0, 1, ..., 99.
+    // for(int i=0;i<50;i++)
+    //     v1.push_back(i);
+    // for (int i = 50; i < 100; i++)
+    //     v2.push_back(i);
+    // //std::iota(std::begin(v1), std::end(v1), 0); // Fill with 0, 1, ..., 99.
     
     //std::iota(std::begin(v2), std::end(v2), 50); // Fill with 0, 1, ..., 99.
     // std::cout << "Grid_points A" << std::endl;
@@ -140,15 +140,16 @@ int main()
     x_test = Vec::Random(N, 1);
     std::cout << "The size of K matrix " << Kmat.get_size() << std::endl;
     b1 = Kmat * x_test;         // * Operator 
-    Kmat.solve(b1);
+    Vec x_sol = Kmat.solve(b1);
     //std::cout << b1 << std::endl;
     //std::cout << Kmat.get_size() << std::endl;
     for (int i = 0; i < N; i++)
         v3.push_back(i);
-    b2 = kernelfunc->getMatrix(v3, v3) * x_test;    // Exact value
-    //std::cout << b2 << std::endl;
+    // b2 = kernelfunc->getMatrix(v3, v3) * x_test;    // Exact value
+    b2 = Kmat * x_sol; // Exact value
+    // std::cout << b2 << std::endl;
     std::cout << "Relative Error.. hmatrix ... " << Vec_ops::relative_error(b2, b1) << std::endl;
-    std::cout << "Relative Error.. GMRES ... " << Vec_ops::relative_error(b1, x_test) << std::endl;
+    std::cout << "Relative Error.. GMRES ... " << Vec_ops::relative_error(x_sol, x_test) << std::endl;
     // std::cout << kernelfunc->getRow(1, v2) << endl;
     // std::cout << kernelfunc->getCol(1,v1) << endl;
     // Mat K,L, R;
