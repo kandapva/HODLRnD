@@ -50,8 +50,8 @@ public:
     // solve using GMRES
     Vec solve(Vec& b){
         Vec x = Vec::Zero(b.size());
-        x += b;
-        HODLRdD_matrix<Kernel>* mat_obj;
+        x = b;
+        HODLRdD_matrix<Kernel> *mat_obj;
         mat_obj = this;
         iterSolver<HODLRdD_matrix<Kernel> > solve_obj(100, N, eps_ACA);
         solve_obj.set_output_file("gmres_out.txt");

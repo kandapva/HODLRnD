@@ -79,6 +79,7 @@ public:
     void get_node_potential();
     void set_node_charge(const Vec &b){
         node_charge = Vec::Zero(n_particles);
+        node_potential = Vec::Zero(n_particles);
         for (size_t i = 0; i < n_particles; i++)
         {
             size_t tmp = my_cluster->index_of_points[i];
@@ -179,7 +180,7 @@ void Node<Kernel>::get_node_potential(){
             //std::cout << "Neighbor id ";
             for (int i = 0; i < n_neighbours; i++)
             {
-                std::cout  << my_neighbour_addr[i]->self_id << " " << std::endl;
+                //std::cout  << my_neighbour_addr[i]->self_id << " " << std::endl;
                 if (my_neighbour_addr[i]->n_particles != 0)
                     node_potential += P2P[i] * my_neighbour_addr[i]->node_charge;
             }
@@ -190,7 +191,7 @@ void Node<Kernel>::get_node_potential(){
     //std::cout << "Interaction  id " ;
     for (int i = 0; i < n_intraction; i++)
     {
-        std::cout << my_intr_list_addr[i]->self_id << " ";
+        //std::cout << my_intr_list_addr[i]->self_id << " ";
         // if (my_intr_list_addr[i]->n_particles != 0)
         //     node_potential += (L2P[i] * (P2M[i].transpose() * my_intr_list_addr[i]->node_charge));
         if (my_intr_list_addr[i]->n_particles != 0)

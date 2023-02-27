@@ -27,24 +27,24 @@ public:
         
         for (int i = 0; i < numPoints; i++){
             for (int j = 0; j < numPoints; j++){
-                for (int k = 0; k < numPoints; k++){
-                    for (int l = 0; l < numPoints; l++){
+               // for (int k = 0; k < numPoints; k++){
+                 //   for (int l = 0; l < numPoints; l++){
                         ptsnD temp;
                         temp.x[0] = loc_dir[0][i];
                         temp.x[1] = loc_dir[1][j];
-                        temp.x[2] = loc_dir[2][k];
-                        temp.x[3] = loc_dir[3][l];
+                   //     temp.x[2] = loc_dir[2][k];
+                //    temp.x[3] = loc_dir[3][l];
                         temp.id = cts++;
                         gridPoints->push_back(temp);
-                    }
-                }
+                //    }
+                //}
             }
         }
     }
     // The Green's function in 4D
     dtype_base Kernel_Fun(dtype_base x){
         double c = -1.0/(4*PI*PI);
-        return c/(x*x);
+        return c/(x);
     }
 
     dtype_base getMatrixEntry(int i, int j){
@@ -56,9 +56,10 @@ public:
             double* a = new double[4];
             double* b = new double[4];
 
-            a[0] = 0, a[1] = 0, a[2] = 0, a[3] = 0;
-            b[0] = h*0.5, b[1] = h*0.5, b[2] = h*0.5, b[3] = h*0.5;
-            r = 1.0 +  quadruple_integral(a,b);         // Second kind
+            //a[0] = 0, a[1] = 0, a[2] = 0, a[3] = 0;
+            //b[0] = h*0.5, b[1] = h*0.5, b[2] = h*0.5, b[3] = h*0.5;
+            //r = 1.0 +  quadruple_integral(a,b);         // Second kind
+            r = 500.0;
 
         }
         else{
@@ -66,7 +67,7 @@ public:
             a = gridPoints->at(i);
             b = gridPoints->at(j);
             r = nd_points::euclidean_distance(a, b);
-            r = h4 * Kernel_Fun(r);                        // Kernel function
+            r = Kernel_Fun(r);                        // Kernel function
         }
         return r;
     }
@@ -91,17 +92,17 @@ int main()
     }
     for (int i = 0; i < numPoints; i++){
         for (int j = 0; j < numPoints; j++){
-            for (int k = 0; k < numPoints; k++){
-                for (int l = 0; l < numPoints; l++){
+            //for (int k = 0; k < numPoints; k++){
+               // for (int l = 0; l < numPoints; l++){
                     ptsnD temp;
                     temp.x[0] = loc_dir[0][i];
                     temp.x[1] = loc_dir[1][j];
-                    temp.x[2] = loc_dir[2][k];
-                    temp.x[3] = loc_dir[3][l];
+                    //temp.x[2] = loc_dir[2][k];
+                    //temp.x[3] = loc_dir[3][l];
                     temp.id = cts++;
                     gridPoints->push_back(temp);
-                }
-            }
+                //}
+           // }
         }
     }
     std::vector<size_t> v1;                  // vector with 100 ints.
@@ -141,13 +142,19 @@ int main()
     std::cout << "The size of K matrix " << Kmat.get_size() << std::endl;
     b1 = Kmat * x_test;         // * Operator 
     Vec x_sol = Kmat.solve(b1);
+
+
     //std::cout << b1 << std::endl;
     //std::cout << Kmat.get_size() << std::endl;
     for (int i = 0; i < N; i++)
         v3.push_back(i);
-    // b2 = kernelfunc->getMatrix(v3, v3) * x_test;    // Exact value
-    b2 = Kmat * x_sol; // Exact value
+    b2 = kernelfunc->getMatrix(v3, v3) * x_test;    // Exact value
+    //b2 = Kmat * x_sol; // Exact value
     // std::cout << b2 << std::endl;
+    std::cout << "x" << std::endl;
+    std::cout << x_test << std::endl;
+    std::cout << "x _ sol" << std::endl;
+    std::cout << x_sol << std::endl;
     std::cout << "Relative Error.. hmatrix ... " << Vec_ops::relative_error(b2, b1) << std::endl;
     std::cout << "Relative Error.. GMRES ... " << Vec_ops::relative_error(x_sol, x_test) << std::endl;
     // std::cout << kernelfunc->getRow(1, v2) << endl;

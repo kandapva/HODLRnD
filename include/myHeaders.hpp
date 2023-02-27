@@ -28,9 +28,9 @@ using namespace Eigen;
 
 /////////////////////////////////////////////////////////////
 // HODLR matrix parameters
-const int NDIM = 4;
-const int Nmax = 5000;
-const int numPoints = 10;         // Along 1D
+const int NDIM = 2;
+const int Nmax = 500;
+const int numPoints = 5;         // Along 1D
 // The admissibility is based on the max norm of the center
 const int INTERACTION_TYPE_ALLOWED = 0; // This represents d'
 const double eps_ACA = pow(10,-6);

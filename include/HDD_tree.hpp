@@ -78,7 +78,7 @@ public:
     }
     
     // mat-vec product
-    Vec mat_vec(const Vec& x){
+    Vec mat_vec(Vec& x){
         std::cout << "Mat-vec" << std::endl;
         Vec b = Vec::Zero(x.size());
         for (int i = 0; i < level; i++)
