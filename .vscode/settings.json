@@ -53,5 +53,8 @@
         "tuple": "cpp",
         "typeinfo": "cpp",
         "utility": "cpp"
-    }
+    },
+    "cSpell.words": [
+        "ptsn"
+    ]
 }

@@ -6,7 +6,7 @@
 #include "Gauss_Legendre_Nodes_and_Weights.hpp"
 
 int n_gauss_nodes = numPoints;
-const double PI = 4.0 * atan(1);
+
 
 double Integrand(double x,double y, double z, double w)
 {

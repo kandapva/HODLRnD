@@ -1,0 +1,111 @@
+HMATRIX START
+[-1,1] [-1,1] [-1,1] 
+Root Formed
+[-1,0] [-1,1] [-1,1] 
+[0,1] [-1,1] [-1,1] 
+[-1,0] [-1,0] [-1,1] 
+[-1,0] [0,1] [-1,1] 
+[0,1] [-1,0] [-1,1] 
+[0,1] [0,1] [-1,1] 
+[-1,0] [-1,0] [-1,0] 
+[-1,0] [-1,0] [0,1] 
+[-1,0] [0,1] [-1,0] 
+[-1,0] [0,1] [0,1] 
+[0,1] [-1,0] [-1,0] 
+[0,1] [-1,0] [0,1] 
+[0,1] [0,1] [-1,0] 
+[0,1] [0,1] [0,1] 
+Cluster recieved
+Node (1,0) Formed
+Node (1,1) Formed
+Node (1,2) Formed
+Node (1,3) Formed
+Node (1,4) Formed
+Node (1,5) Formed
+Node (1,6) Formed
+Node (1,7) Formed
+Tree Formed
+HMATRIX DONE
+Matrix operators formed...
+The size of K matrix 343
+============HODLRnD=================
+Tree Depth:2
+______________________________
+
+Level[0]
+**************
+Node [0] , Nunmber particles = 343
+
+Bounding box : [-1,1]x[-1,1]x[-1,1]
+Neighbours -
+Interaction List -
+**************
+
+______________________________
+Level[1]
+**************
+Node [0] , Nunmber particles = 27
+
+Bounding box : [-1,0]x[-1,0]x[-1,0]
+Neighbours -
+Interaction List - 1 2 3 4 5 6 7
+**************
+
+**************
+Node [1] , Nunmber particles = 36
+
+Bounding box : [-1,0]x[-1,0]x[0,1]
+Neighbours -
+Interaction List - 0 2 3 4 5 6 7
+**************
+
+**************
+Node [2] , Nunmber particles = 36
+
+Bounding box : [-1,0]x[0,1]x[-1,0]
+Neighbours -
+Interaction List - 0 1 3 4 5 6 7
+**************
+
+**************
+Node [3] , Nunmber particles = 48
+
+Bounding box : [-1,0]x[0,1]x[0,1]
+Neighbours -
+Interaction List - 0 1 2 4 5 6 7
+**************
+
+**************
+Node [4] , Nunmber particles = 36
+
+Bounding box : [0,1]x[-1,0]x[-1,0]
+Neighbours -
+Interaction List - 0 1 2 3 5 6 7
+**************
+
+**************
+Node [5] , Nunmber particles = 48
+
+Bounding box : [0,1]x[-1,0]x[0,1]
+Neighbours -
+Interaction List - 0 1 2 3 4 6 7
+**************
+
+**************
+Node [6] , Nunmber particles = 48
+
+Bounding box : [0,1]x[0,1]x[-1,0]
+Neighbours -
+Interaction List - 0 1 2 3 4 5 7
+**************
+
+**************
+Node [7] , Nunmber particles = 64
+
+Bounding box : [0,1]x[0,1]x[0,1]
+Neighbours -
+Interaction List - 0 1 2 3 4 5 6
+**************
+
+______________________________
+====================================

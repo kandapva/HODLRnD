@@ -59,6 +59,11 @@ public:
         // Routine to compute the GMRES iterations
         return x;
     }
+    void print_matrix_details(){
+        std::cout << "============HODLRnD=================" << std::endl;
+        HODLRdD_tree->print_tree_details();
+        std::cout << "====================================" << std::endl;
+    }
     // Destructor
     ~HODLRdD_matrix(){
     }

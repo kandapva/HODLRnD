@@ -24,7 +24,7 @@ class Node
     bool is_admissible(Node<Kernel>*& A){
         // Check the max norm between the center of two clusters
         double dist_btwn_cluster_center = nd_points::max_norm_distance(this->cluster_center, A->cluster_center);
-        if (dist_btwn_cluster_center < 1.5 * this->my_cluster->get_diameter())
+        if (dist_btwn_cluster_center < 1.5 * this->my_cluster->box_length())
             if (interaction_type(this->my_cluster, A->my_cluster) > INTERACTION_TYPE_ALLOWED)
                 return false;
         return true;
@@ -62,7 +62,7 @@ public:
         n_neighbours = 0;
         n_intraction = 0;
         n_particles = src->get_cluster_size();
-        std::cout << "cluster size " << n_particles << std::endl;
+        //std::cout << "cluster size " << n_particles << std::endl;
         // Update child list of the parents
         //parent->Child.push_back(this);
         isroot = false;
@@ -94,6 +94,20 @@ public:
             size_t tmp = my_cluster->index_of_points[i];
             b(tmp) += node_potential(i);
         }
+    }
+    void print_node_details(){
+        std::cout << "**************" << std::endl;
+        std::cout << "Node [" << self_id << "] , Nunmber particles = " << n_particles << std::endl;
+        my_cluster->print_bounding_box();
+        std::cout << "Neighbours -";
+        for (int i = 0; i < n_neighbours; i++)
+            std::cout << " " << my_neighbour_addr[i]->self_id;
+        std::cout << std::endl;
+        std::cout << "Interaction List -";
+        for (int i = 0; i < n_intraction; i++)
+            std::cout << " " << this->my_intr_list_addr[i]->self_id;
+        std::cout << std::endl;
+        std::cout << "**************" << std::endl;
     }
 };
 
@@ -133,7 +147,7 @@ void Node<Kernel>::Initialize_node()
 template<class Kernel>
 void Node<Kernel>::get_interaction_list()
 {
-    std::cout << "Self--- " << self_id << std::endl;
+    // std::cout << "Self--- " << self_id << std::endl;
     if(!isroot){
         // The interaction list consists of nodes from two sources
         //      1) Siblings
@@ -160,13 +174,7 @@ void Node<Kernel>::get_interaction_list()
         }
     }
     this->n_neighbours = this->my_neighbour_addr.size();
-    std::cout << "Neighbours--- " << n_neighbours << std::endl;
-    for (int i = 0; i < n_neighbours; i++)
-        std::cout << " " << my_neighbour_addr[i]->self_id << std::endl; // 
     this->n_intraction = this->my_intr_list_addr.size();
-    std::cout << "Interactions~~~ " << n_intraction << std::endl;
-    for (int i = 0; i < n_intraction; i++)
-        std::cout << this->my_intr_list_addr[i]->self_id << std::endl;
     }
 
 template<class Kernel>
@@ -197,7 +205,7 @@ void Node<Kernel>::get_node_potential(){
         if (my_intr_list_addr[i]->n_particles != 0)
             node_potential += LR[i] * my_intr_list_addr[i]->node_charge;
         }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
     // TODO : Routine Reduced memory matvec
 }

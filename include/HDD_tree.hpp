@@ -22,7 +22,7 @@ public:
         this->gridPoints = gPoints;
         this->src = src_;
         int Nlevel = gridPoints->size();
-        std::cout << Nlevel << std::endl;
+        //std::cout << Nlevel << std::endl;
         std::vector<size_t> v(Nlevel);
         for (int i = 0; i < Nlevel; i++){
             v[i] = i;
@@ -75,28 +75,43 @@ public:
         for(int i=0;i<level;i++)
             for (size_t j = 0; j < obj_arr[i].size(); j++)
                 obj_arr[i][j]->Initialize_node();
+        std::cout << "Matrix operators formed..." << std::endl;
     }
     
     // mat-vec product
     Vec mat_vec(Vec& x){
-        std::cout << "Mat-vec" << std::endl;
         Vec b = Vec::Zero(x.size());
         for (int i = 0; i < level; i++)
             for (size_t j = 0; j < obj_arr[i].size(); j++)
                 obj_arr[i][j]->set_node_charge(x);
-        std::cout << "x set" << std::endl;
+        //std::cout << "x set" << std::endl;
         // perform node wise matrix vector
         for (int i = 0; i < level; i++) 
             for (size_t j = 0; j < obj_arr[i].size(); j++)
                 obj_arr[i][j]->get_node_potential();
-        std::cout << "b compute" << std::endl;
+        //std::cout << "b compute" << std::endl;
         // Collect the output vector
         for (int i = 0; i < level; i++)
             for (size_t j = 0; j < obj_arr[i].size(); j++)
                 obj_arr[i][j]->collect_potential(b);
-        std::cout << "b calculate" << std::endl;
+        //std::cout << "b calculate" << std::endl;
+        //std::cout << "Mat-vec performed..." << std::endl;
         return b;
     }
+    void print_tree_details(){
+        std::cout << "Tree Depth:"  << level << std::endl;
+        std::cout << "______________________________" << std::endl;
+        std::cout << std::endl;
+        for (int i = 0; i < level; i++){
+            std::cout << "Level[" << i << "]" << std::endl;
+            for (size_t j = 0; j < obj_arr[i].size(); j++)
+            {
+                obj_arr[i][j]->print_node_details();
+                std::cout << std::endl;
+            }
+            std::cout << "______________________________" << std::endl;
+        }           
+    }    
     // Destructor
     ~Tree(){
     }

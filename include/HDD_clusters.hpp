@@ -39,6 +39,17 @@ public:
         diam = sqrt(diam);
         cluster_id = 0;
     }
+    void print_bounding_box(){
+        std::cout << std::endl << "Bounding box : " ;
+        for (int i = 0; i < NDIM; i++)
+        {
+            if(i != NDIM-1)
+                std::cout << "[" << this->x1[i] << "," << this->x2[i] << "]x"; 
+            else
+                std::cout << "[" << this->x1[i] << "," << this->x2[i] << "]";
+        }
+        std::cout << std::endl;
+    }
     void add_point(size_t a)
     {
         index_of_points.push_back(a);

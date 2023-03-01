@@ -26,13 +26,21 @@
 using std::string;
 using namespace Eigen;
 
+const double PI = 4.0 * atan(1);
 /////////////////////////////////////////////////////////////
 // HODLR matrix parameters
-const int NDIM = 2;
-const int Nmax = 500;
-const int numPoints = 5;         // Along 1D
+const int NDIM = 3;
+const int Nmax = 100;
+const int numPoints = 7;         // Along 1D
 // The admissibility is based on the max norm of the center
-const int INTERACTION_TYPE_ALLOWED = 0; // This represents d'
+const int INTERACTION_TYPE_ALLOWED = 2; // This represents d'
+// 2D 
+// d' = 0 -> Vertex, HODLR2D 
+// d' = 1 -> HODLR in 2D
+// 3D
+// d' = 0 -> Vertex, HODLR3D
+// d' = 1 -> edge
+// d' = 2 -> face 
 const double eps_ACA = pow(10,-6);
 const int SYS_SIZE = (int) pow(numPoints,NDIM);
 const int N = pow(numPoints,NDIM);
@@ -157,6 +165,17 @@ namespace storedata
     }
 }
 #endif
+
+template <typename T>
+void inline print_vec(std::vector<T> &vec_to_print)
+{
+    for (auto iter = vec_to_print.begin(); iter != vec_to_print.end(); iter++)
+    {
+        if (iter != vec_to_print.begin())
+            std::cout << ", ";
+        std::cout << *iter;
+    }
+}
 
 #endif
 
