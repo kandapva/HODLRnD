@@ -214,3 +214,8 @@ public:
 */
 
 // ?? Interaction list
+
+// Statistics for the article
+// 1) Compression ratio (Matrix)
+// 2) Maximum rank of the Tree (Tree)
+// Estimated memory vs the original memory

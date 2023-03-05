@@ -75,6 +75,8 @@ public:
     }
 
     void Initialize_node();
+    void find_max_rank(size_t &MAX_RANK);
+    double compute_flop_count();
     void get_interaction_list();
     void get_node_potential();
     void set_node_charge(const Vec &b){
@@ -177,8 +179,49 @@ void Node<Kernel>::get_interaction_list()
     this->n_intraction = this->my_intr_list_addr.size();
     }
 
-template<class Kernel>
-void Node<Kernel>::get_node_potential(){
+    template <class Kernel>
+    double Node<Kernel>::compute_flop_count()
+    {
+        double my_flop = 0.0;
+        if(n_particles != 0){
+            if(this->isleaf){
+                my_flop += n_particles;
+                for (int i = 0; i < n_neighbours; i++){
+                    if (my_neighbour_addr[i]->n_particles != 0)
+                        my_flop += my_neighbour_addr[i]->n_particles;
+                }
+                my_flop *= n_particles;
+            }
+            for (int i = 0; i < n_intraction; i++){
+                if (my_intr_list_addr[i]->n_particles != 0){
+                    my_flop += LR[i]->rank() * (n_particles + my_intr_list_addr[i]->n_particles);
+                }
+            }
+        }    
+        return my_flop;
+    }
+
+    template <class Kernel>
+    void Node<Kernel>::find_max_rank(size_t& MAX_RANK){
+        size_t tmp = MAX_RANK;
+        if(n_particles != 0){
+            for (int i = 0; i < n_intraction; i++)
+            {
+                if (my_intr_list_addr[i]->n_particles != 0)
+                {
+                    if (LR[i]->rank() > tmp)
+                    {
+                        tmp = LR[i]->rank();
+                    }
+                }
+            }
+        }
+        MAX_RANK = tmp;
+    }
+
+    template <class Kernel>
+    void Node<Kernel>::get_node_potential()
+    {
     // Routine for Full memory matvec
     //std::cout << "Self ID " << self_id << std::endl;
     if(isleaf){

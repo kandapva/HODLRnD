@@ -64,6 +64,22 @@ public:
         HODLRdD_tree->print_tree_details();
         std::cout << "====================================" << std::endl;
     }
+
+    void print_matrix_statistics(){
+        double n_FLOP = 0.0;
+        size_t MAX_RANK = 0;
+        double compression_ratio = 1.0/(double(N)*double(N));
+        // 1 double is considered to consume 8 bytes of physical memory
+        double memory_gb = 8 * pow(10,-9);
+        HODLRdD_tree->get_stat(n_FLOP, MAX_RANK);
+        compression_ratio *= n_FLOP;
+        memory_gb *= n_FLOP;
+        std::cout << getTimeStamp() << std::endl;
+        std::cout << "Memory (in GB) : " << memory_gb << std::endl;
+        std::cout << "Number of FLOP : " << n_FLOP << std::endl;
+        std::cout << "Compression Ratio : " << compression_ratio << std::endl;
+        std::cout << "Maximum rank across the Tree : " << MAX_RANK << std::endl;
+    }
     // Destructor
     ~HODLRdD_matrix(){
     }

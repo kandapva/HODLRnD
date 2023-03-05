@@ -13,6 +13,8 @@ class Tree
     std::vector<ptsnD> *gridPoints;
     std::vector<std::vector<Node<Kernel> *>> obj_arr;
     Node<Kernel> *root;
+    double MAT_VEC_TIME = 0.0;
+    double INIT_TIME = 0.0;
     int level;
     cluster *src;
 public:
@@ -72,48 +74,73 @@ public:
     }
     // Initialise the matrix operators
     void Initialise_tree(){
-        for(int i=0;i<level;i++)
-            for (size_t j = 0; j < obj_arr[i].size(); j++)
-                obj_arr[i][j]->Initialize_node();
+        double start = omp_get_wtime();
+        #pragma omp parallel num_threads(nThreads) shared(obj_arr, level)
+        {
+            #pragma omp for collapse(2) schedule(dynamic, 1)
+            for (int i = 0; i < level; i++) 
+                for (size_t j = 0; j < obj_arr[i].size(); j++)
+                    obj_arr[i][j]->Initialize_node();
+        }
+        INIT_TIME = omp_get_wtime() - start;
         std::cout << "Matrix operators formed..." << std::endl;
     }
     
     // mat-vec product
     Vec mat_vec(Vec& x){
         Vec b = Vec::Zero(x.size());
+        // Using openMP here requires a memeory race while reading
         for (int i = 0; i < level; i++)
             for (size_t j = 0; j < obj_arr[i].size(); j++)
                 obj_arr[i][j]->set_node_charge(x);
         //std::cout << "x set" << std::endl;
         // perform node wise matrix vector
-        for (int i = 0; i < level; i++) 
-            for (size_t j = 0; j < obj_arr[i].size(); j++)
-                obj_arr[i][j]->get_node_potential();
-        //std::cout << "b compute" << std::endl;
-        // Collect the output vector
-        for (int i = 0; i < level; i++)
-            for (size_t j = 0; j < obj_arr[i].size(); j++)
-                obj_arr[i][j]->collect_potential(b);
-        //std::cout << "b calculate" << std::endl;
-        //std::cout << "Mat-vec performed..." << std::endl;
+// #pragma omp parallel for collapse(2) schedule(dynamic)
+        double start = omp_get_wtime();
+        #pragma omp parallel num_threads(nThreads) shared(obj_arr, level)
+        {
+            #pragma omp for collapse(2) schedule(dynamic, 1)
+            for (int i = 0; i < level; i++)
+                for (size_t j = 0; j < obj_arr[i].size(); j++)
+                    obj_arr[i][j]->get_node_potential();
+        }
+        MAT_VEC_TIME = omp_get_wtime() - start;
+        // std::cout << "b compute" << std::endl;
+        //  Collect the output vector
+        for (int i = 0; i < level; i++) for (size_t j = 0; j < obj_arr[i].size(); j++)
+            obj_arr[i][j]->collect_potential(b);
+        // std::cout << "b calculate" << std::endl;
+        // std::cout << "Mat-vec performed..." << std::endl;
         return b;
-    }
-    void print_tree_details(){
-        std::cout << "Tree Depth:"  << level << std::endl;
-        std::cout << "______________________________" << std::endl;
-        std::cout << std::endl;
-        for (int i = 0; i < level; i++){
-            std::cout << "Level[" << i << "]" << std::endl;
-            for (size_t j = 0; j < obj_arr[i].size(); j++)
-            {
-                obj_arr[i][j]->print_node_details();
-                std::cout << std::endl;
-            }
+        }
+        void get_stat(double &n_FLOP, size_t &MAX_RANK)
+        {
+            for (int i = 0; i < level; i++)
+                for (size_t j = 0; j < obj_arr[i].size(); j++)
+                {
+                    n_FLOP += obj_arr[i][j]->compute_flop_count();
+                    obj_arr[i][j]->find_max_rank(MAX_RANK);
+                }
+        }
+        void print_tree_details()
+        {
+            std::cout << "Tree Depth:" << level << std::endl;
             std::cout << "______________________________" << std::endl;
-        }           
-    }    
-    // Destructor
-    ~Tree(){
-    }
-};
+            std::cout << std::endl;
+            for (int i = 0; i < level; i++)
+            {
+                std::cout << "Level[" << i << "]" << std::endl;
+                for (size_t j = 0; j < obj_arr[i].size(); j++)
+                {
+                    obj_arr[i][j]->print_node_details();
+                    std::cout << std::endl;
+                }
+                std::cout << "______________________________" << std::endl;
+            }
+        }
+        // Destructor
+        ~Tree()
+        {
+        }
+    };
 #endif

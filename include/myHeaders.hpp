@@ -27,6 +27,8 @@ using std::string;
 using namespace Eigen;
 
 const double PI = 4.0 * atan(1);
+
+const int nThreads = 4;
 /////////////////////////////////////////////////////////////
 // HODLR matrix parameters
 const int NDIM = 3;
