@@ -144,6 +144,13 @@ public:
                 std::cout << "______________________________" << std::endl;
             }
         }
+        double get_mat_vec_time(){
+            return MAT_VEC_TIME;
+        }
+        double get_Init_time()
+        {
+            return INIT_TIME;
+        }
         // Destructor
         ~Tree()
         {

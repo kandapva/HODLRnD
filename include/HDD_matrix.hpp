@@ -79,6 +79,8 @@ public:
         std::cout << "Number of FLOP : " << n_FLOP << std::endl;
         std::cout << "Compression Ratio : " << compression_ratio << std::endl;
         std::cout << "Maximum rank across the Tree : " << MAX_RANK << std::endl;
+        std::cout << "Time to Initialize (in s) : " << HODLRdD_tree->get_Init_time() << std::endl;
+        std::cout << "Matrix-Vector time (in s) : " << HODLRdD_tree->get_mat_vec_time() << std::endl;
     }
     // Destructor
     ~HODLRdD_matrix(){
