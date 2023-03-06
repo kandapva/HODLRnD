@@ -12,6 +12,7 @@ class Tree
     size_t N;
     std::vector<ptsnD> *gridPoints;
     std::vector<std::vector<Node<Kernel> *>> obj_arr;
+    std::vector<Node<Kernel> *> obj_lin_arr;
     Node<Kernel> *root;
     double MAT_VEC_TIME = 0.0;
     double INIT_TIME = 0.0;
@@ -65,6 +66,9 @@ public:
                     Nlevel = obj_arr[level][j]->n_particles;
             }
             level++;
+            for (int i = 0; i < level; i++)
+                for (size_t j = 0; j < obj_arr[i].size(); j++)
+                    obj_lin_arr.push_back(obj_arr[i][j]);
         }
         std::cout << "Tree Formed" << std::endl;
         // Mark level as leaf
@@ -75,12 +79,15 @@ public:
     // Initialise the matrix operators
     void Initialise_tree(){
         double start = omp_get_wtime();
-        #pragma omp parallel num_threads(nThreads) shared(obj_arr, level)
+#pragma omp parallel num_threads(nThreads) shared(obj_lin_arr, level)
         {
-            #pragma omp for collapse(2) schedule(dynamic, 1)
-            for (int i = 0; i < level; i++) 
-                for (size_t j = 0; j < obj_arr[i].size(); j++)
-                    obj_arr[i][j]->Initialize_node();
+#pragma omp for schedule(dynamic, 1)
+            for (size_t j = 0; j < obj_lin_arr.size(); j++)
+                obj_lin_arr[j]->Initialize_node();
+// #pragma omp for collapse(2) schedule(dynamic, 1)
+//                     for (int i = 0; i < level; i++) for (size_t j = 0; j < obj_arr[i].size(); j++)
+//                         obj_arr[i][j]
+//                             ->Initialize_node();
         }
         INIT_TIME = omp_get_wtime() - start;
         std::cout << "Matrix operators formed..." << std::endl;
@@ -97,12 +104,11 @@ public:
         // perform node wise matrix vector
 // #pragma omp parallel for collapse(2) schedule(dynamic)
         double start = omp_get_wtime();
-        #pragma omp parallel num_threads(nThreads) shared(obj_arr, level)
+#pragma omp parallel num_threads(nThreads) shared(obj_lin_arr, level)
         {
-            #pragma omp for collapse(2) schedule(dynamic, 1)
-            for (int i = 0; i < level; i++)
-                for (size_t j = 0; j < obj_arr[i].size(); j++)
-                    obj_arr[i][j]->get_node_potential();
+            #pragma omp for schedule(dynamic, 1)
+                for (size_t j = 0; j < obj_lin_arr.size(); j++)
+                    obj_lin_arr[j]->get_node_potential();
         }
         MAT_VEC_TIME = omp_get_wtime() - start;
         // std::cout << "b compute" << std::endl;
