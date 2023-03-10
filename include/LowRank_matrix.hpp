@@ -43,10 +43,8 @@ public:
         if (is_mem_efficient)
         {
             //std::cout << "(" << b.size() << ")" << std::endl;
-            Mat Ac = userkernel->getMatrix(row_id, col_basis);
-            std::cout << "(" << Ac.rows() << "," << Ac.cols() << ")" << std::endl;
-            Mat Ar = userkernel->getMatrix(row_basis, col_id);
-            std::cout << "(" << Ar.rows() << "," << Ar.cols() << ")" << std::endl;
+            //std::cout << "(" << Ac.rows() << "," << Ac.cols() << ")" << std::endl;
+            //std::cout << "(" << Ar.rows() << "," << Ar.cols() << ")" << std::endl;
             // Vec t0 = Ar * x;
             // std::cout << "(" << L.rows() << "," << L.cols() << ")" << std::endl;
             // std::cout << "(" << R.rows() << "," << R.cols() << ")" << std::endl;
@@ -54,6 +52,8 @@ public:
             // //std::cout << "(" << t1.size() << ")" << std::endl;
             // Vec t2 = R.triangularView<Eigen::Upper>().solve(t1);
             // //std::cout << "(" << t2.size() << ")" << std::endl;
+            Mat Ac = userkernel->getMatrix(row_id, col_basis);
+            Mat Ar = userkernel->getMatrix(row_basis, col_id);
             Vec t2 = K->solve(Ar * x);
             b = Ac * t2;
         }
