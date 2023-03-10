@@ -56,6 +56,7 @@ public:
         iterSolver<HODLRdD_matrix<Kernel> > solve_obj(100, N, eps_ACA);
         solve_obj.set_output_file("gmres_out.txt");
         int k = solve_obj.GMRES(mat_obj, x, b);
+        std::cout << "GMRES status : " << k << std::endl;
         // Routine to compute the GMRES iterations
         return x;
     }

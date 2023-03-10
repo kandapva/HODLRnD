@@ -46,7 +46,7 @@ int main()
         // std::cout << x_test << std::endl;
         // std::cout << "x _ sol" << std::endl;
         // std::cout << x_sol << std::endl;
-        //std::cout << "Relative Error.. hmatrix ... " << Vec_ops::relative_error(b2, b1) << std::endl;
+        std::cout << "Relative Error.. hmatrix ... " << Vec_ops::relative_error(b2, b1) << std::endl;
         //std::cout << "Relative Error.. GMRES ... " << Vec_ops::relative_error(x_sol, x_test) << std::endl;
     }
     return 0;

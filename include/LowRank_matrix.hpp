@@ -14,6 +14,8 @@ class LowRankMat
     std::vector<size_t> row_basis;
     std::vector<size_t> col_basis;
     kernel_function<Kernel> *userkernel;
+    ColPivHouseholderQR<Mat> *K;
+
 public:
     LowRankMat(){
     }
@@ -23,10 +25,10 @@ public:
         row_id.assign(sources.begin(), sources.end());
         col_id.assign(targets.begin(), targets.end());
         if(SYS_SIZE < col_id.size() || mem){
-            std::cout << "MEM start" << std::endl;
+            std::cout << "MEM Eff" << std::endl;
             ACA_MEM_EFF(sources, targets);
             is_mem_efficient = true;
-            std::cout << "MEM done" << std::endl;
+            //std::cout << "MEM done" << std::endl;
         }
         else{
             ACA_FAST(sources, targets);
@@ -37,17 +39,23 @@ public:
     }
     Vec operator * (Vec x)
     {
-        Vec b = Vec::Zero(x.size());
+        Vec b;
         if (is_mem_efficient)
         {
+            //std::cout << "(" << b.size() << ")" << std::endl;
             Mat Ac = userkernel->getMatrix(row_id, col_basis);
             std::cout << "(" << Ac.rows() << "," << Ac.cols() << ")" << std::endl;
             Mat Ar = userkernel->getMatrix(row_basis, col_id);
             std::cout << "(" << Ar.rows() << "," << Ar.cols() << ")" << std::endl;
-            Vec t0 = Ar * x;
-            Vec t1 = L.triangularView<Eigen::Lower>().solve(t0);
-            Vec t2 = R.triangularView<Eigen::Upper>().solve(t1);
-            b += Ac * t2;
+            // Vec t0 = Ar * x;
+            // std::cout << "(" << L.rows() << "," << L.cols() << ")" << std::endl;
+            // std::cout << "(" << R.rows() << "," << R.cols() << ")" << std::endl;
+            // Vec t1 = L.triangularView<Eigen::Lower>().solve(t0);
+            // //std::cout << "(" << t1.size() << ")" << std::endl;
+            // Vec t2 = R.triangularView<Eigen::Upper>().solve(t1);
+            // //std::cout << "(" << t2.size() << ")" << std::endl;
+            Vec t2 = K->solve(Ar * x);
+            b = Ac * t2;
         }
         else
             b = L * (R.transpose() * x);
@@ -668,6 +676,7 @@ public:
                 R = Mat::Identity(n_cols, n_cols);
                 computed_rank = n_cols;
             }
+            is_mem_efficient = false;
         }
 
         // This is when ACA has succeeded:
@@ -684,28 +693,32 @@ public:
             R = Mat::Zero(computed_rank, computed_rank);
             if (computed_rank > 0)
             {
-                for (int i = 0; i < computed_rank; i++)
-                {
-                    L(i, i) = 1.0;
-                    if (i >= 1)
-                    {
-                        for (int j = 0; j <= i - 1; j++)
-                        {
-                            L(i, j) = u[j](row_ind[i]);
-                        }
-                    }
-                }
-                for (int i = 0; i < computed_rank; i++)
-                {
-                    R(i, i) = v[i](col_ind[i]);
-                    if (i >= 1)
-                    {
-                        for (int j = 0; j <= i - 1; j++)
-                        {
-                            R(j, i) = v[j](col_ind[i]);
-                        }
-                    }
-                }
+                // Considered this QR mainly because of its comprise with speed and stability
+                Mat A = userkernel->getMatrix(row_basis,col_basis);
+                K = new ColPivHouseholderQR<Mat>(A); 
+                // for (int i = 0; i < computed_rank; i++)
+                // {
+                //     L(i, i) = 1.0;
+                //     if (i >= 1)
+                //     {
+                //         for (int j = 0; j <= i - 1; j++)
+                //         {
+                //             L(i, j) = u[j](row_ind[i]);
+                //         }
+                //     }
+                // }
+                // for (int i = 0; i < computed_rank; i++)
+                // {
+                //     R(i, i) = v[i](col_ind[i]);
+                //     if (i >= 1)
+                //     {
+                //         for (int j = 0; j <= i - 1; j++)
+                //         {
+                //             R(j, i) = v[j](col_ind[i]);
+                //             //R(j, i) = v[i](col_ind[j]);
+                //         }
+                //     }
+                // }
             }
         }
     }
