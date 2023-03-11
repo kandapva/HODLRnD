@@ -10,7 +10,8 @@ int n_gauss_nodes = numPoints;
 
 double Integrand(double x,double y, double z, double w)
 {
-    return 1/(x*x + y*y + z*z + w*w);
+    double c = -1.0 / (4 * PI);
+    return c * 0.5 * log(x*x + y*y + z*z + w*w);
 }
 
 // a = [x_low,y_low] and b = [x_upper,y_upper]

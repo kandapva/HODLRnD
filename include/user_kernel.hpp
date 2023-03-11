@@ -115,7 +115,7 @@ public:
 };
 
 class kernel_4d_test{
-    double c = -1.0 / (4 * PI * PI);
+    double c = -1.0 / (4 * PI);
 public:
     std::vector<ptsnD> *gridPoints;
     kernel_4d_test()
@@ -158,7 +158,7 @@ public:
     // The Green's function in 4D
     dtype_base Kernel_Fun(dtype_base x)
     {
-            return c / (x*x);
+            return c * log(x);
     }
     dtype_base getMatrixEntry(int i, int j)
     {
