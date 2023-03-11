@@ -21,9 +21,9 @@ int main()
         Y(i) = 1;
     }
 
-    kernel_3d_test *ker = new kernel_3d_test();
+    kernel_4d_test *ker = new kernel_4d_test();
     ker->get_points(gridPoints);
-    kernel_function<kernel_3d_test> *kernelfunc = new kernel_function<kernel_3d_test>(ker);
+    kernel_function<kernel_4d_test> *kernelfunc = new kernel_function<kernel_4d_test>(ker);
     HODLRdD_matrix Kmat = HODLRdD_matrix(ker, gridPoints, X, Y);
     Kmat.Assemble_matrix_operators();
     Vec x, b, bl;
@@ -32,8 +32,9 @@ int main()
     x_test = Vec::Random(N, 1);
     std::cout << "The size of K matrix " << Kmat.get_size() << std::endl;
     b1 = Kmat * x_test;         // * Operator 
-    //Vec x_sol = Kmat.solve(b1);
-    Kmat.print_matrix_details();
+    Vec x_sol = Kmat.solve(b1);
+    //Kmat.print_matrix_details();
+    Kmat.print_matrix_statistics();
     if (N < 3000)
     {
         std::vector<size_t> v3;
@@ -45,7 +46,7 @@ int main()
         // std::cout << x_test << std::endl;
         // std::cout << "x _ sol" << std::endl;
         // std::cout << x_sol << std::endl;
-        //std::cout << "Relative Error.. hmatrix ... " << Vec_ops::relative_error(b2, b1) << std::endl;
+        std::cout << "Relative Error.. hmatrix ... " << Vec_ops::relative_error(b2, b1) << std::endl;
         //std::cout << "Relative Error.. GMRES ... " << Vec_ops::relative_error(x_sol, x_test) << std::endl;
     }
     return 0;

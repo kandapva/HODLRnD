@@ -4,6 +4,7 @@
 #include "myHeaders.hpp"
 #include "points_dt.hpp"
 #include "HDD_clusters.hpp"
+#include "../integral_equation_4D/integral4d.hpp"
 
 // Test Greens' function in 2d, 3d and 4d
 class kernel_2d_test{
@@ -162,10 +163,19 @@ public:
     dtype_base getMatrixEntry(int i, int j)
     {
             double r;
-            if (i == j)
-                r = 0.0;
+            double h = 1.0/numPoints;
+            double h4 = pow(h,4.0);
+            if (i == j){
+                double* a = new double[4];
+                double* b = new double[4];
+
+                a[0] = 0, a[1] = 0, a[2] = 0, a[3] = 0;
+                b[0] = h*0.5, b[1] = h*0.5, b[2] = h*0.5, b[3] = h*0.5;
+                r = 1.0 + quadruple_integral(a,b);         // Second kind
+                //r = sqrt(N);
+            }
             else
-                r = Kernel_Fun(nd_points::euclidean_distance(gridPoints->at(i), gridPoints->at(j)));
+                r = h4 * Kernel_Fun(nd_points::euclidean_distance(gridPoints->at(i), gridPoints->at(j)));
             return r;
     }
     ~kernel_4d_test(){}

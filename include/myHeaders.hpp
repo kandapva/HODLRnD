@@ -20,8 +20,8 @@
 #include <stack>
 
 #define _USE_MATH_DEFINES
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 
 using std::string;
 using namespace Eigen;
@@ -31,11 +31,11 @@ const double PI = 4.0 * atan(1);
 const int nThreads = 4;
 /////////////////////////////////////////////////////////////
 // HODLR matrix parameters
-const int NDIM = 3;
+const int NDIM = 4;
 const int Nmax = 100;
-const int numPoints = 7;         // Along 1D
+const int numPoints = 5;         // Along 1D
 // The admissibility is based on the max norm of the center
-const int INTERACTION_TYPE_ALLOWED = 2; // This represents d'
+const int INTERACTION_TYPE_ALLOWED = 1; // This represents d'
 // 2D 
 // d' = 0 -> Vertex, HODLR2D 
 // d' = 1 -> HODLR in 2D
@@ -44,7 +44,7 @@ const int INTERACTION_TYPE_ALLOWED = 2; // This represents d'
 // d' = 1 -> edge
 // d' = 2 -> face 
 const double eps_ACA = pow(10,-6);
-const int SYS_SIZE = (int) pow(numPoints,NDIM);
+const int SYS_SIZE = 10;
 const int N = pow(numPoints,NDIM);
 
 /////////////////////////////////////////////////////////////

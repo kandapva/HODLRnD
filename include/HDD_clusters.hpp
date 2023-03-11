@@ -33,9 +33,9 @@ public:
             if (abs(this->x1[i] - this->x2[i]) > L)
                 L = abs(this->x1[i] - this->x2[i]);
             diam += (x1_(i) - x2_(i)) * (x1_(i) - x2_(i));
-            std::cout << "[" << this->x1[i] << "," << this->x2[i] << "] "; 
+            //std::cout << "[" << this->x1[i] << "," << this->x2[i] << "] "; 
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
         diam = sqrt(diam);
         cluster_id = 0;
     }

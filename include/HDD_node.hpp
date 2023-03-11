@@ -194,7 +194,7 @@ void Node<Kernel>::get_interaction_list()
             }
             for (int i = 0; i < n_intraction; i++){
                 if (my_intr_list_addr[i]->n_particles != 0){
-                    my_flop += LR[i]->rank() * (n_particles + my_intr_list_addr[i]->n_particles);
+                    my_flop += LR[i].rank() * (n_particles + my_intr_list_addr[i]->n_particles);
                 }
             }
         }    
@@ -209,9 +209,9 @@ void Node<Kernel>::get_interaction_list()
             {
                 if (my_intr_list_addr[i]->n_particles != 0)
                 {
-                    if (LR[i]->rank() > tmp)
+                    if ((size_t) LR[i].rank() > tmp)
                     {
-                        tmp = LR[i]->rank();
+                        tmp = LR[i].rank();
                     }
                 }
             }

@@ -48,13 +48,13 @@ public:
                 std::vector<cluster *> *t;
                 t = new std::vector<cluster *>;
                 obj_arr[level-1][i]->my_cluster->level_clustering(t);
-                std::cout << "Cluster recieved" << std::endl;
+                //std::cout << "Cluster recieved" << std::endl;
                 for(size_t j=0; j<t->size();j++){
                     Node<Kernel> *temp;
                     temp = new Node<Kernel>(t->at(j), obj_arr[level-1][i], usr_);
                     obj_arr[level].push_back(temp);
                     obj_arr[level - 1][i]->Child.push_back(temp);
-                    std::cout<< "Node (" << level << "," << temp->get_id() << ") Formed" << std::endl;
+                    //std::cout<< "Node (" << level << "," << temp->get_id() << ") Formed" << std::endl;
                 }
                 delete t;
             }
