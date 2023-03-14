@@ -25,7 +25,7 @@ public:
         row_id.assign(sources.begin(), sources.end());
         col_id.assign(targets.begin(), targets.end());
         if(SYS_SIZE < col_id.size() || mem){
-            std::cout << "MEM Eff" << std::endl;
+            //std::cout << "MEM Eff" << std::endl;
             ACA_MEM_EFF(sources, targets);
             is_mem_efficient = true;
             //std::cout << "MEM done" << std::endl;

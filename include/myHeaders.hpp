@@ -32,8 +32,8 @@ const int nThreads = 4;
 /////////////////////////////////////////////////////////////
 // HODLR matrix parameters
 const int NDIM = 4;
-const int Nmax = 100;
-const int numPoints = 5;         // Along 1D
+const int Nmax = 1000;
+int numPoints = 10;         // Along 1D
 // The admissibility is based on the max norm of the center
 const int INTERACTION_TYPE_ALLOWED = 1; // This represents d'
 // 2D 
@@ -43,9 +43,9 @@ const int INTERACTION_TYPE_ALLOWED = 1; // This represents d'
 // d' = 0 -> Vertex, HODLR3D
 // d' = 1 -> edge
 // d' = 2 -> face 
-const double eps_ACA = pow(10,-6);
-const int SYS_SIZE = 10;
-const int N = pow(numPoints,NDIM);
+const double eps_ACA = pow(10,-10);
+const int SYS_SIZE = 2 * Nmax;
+size_t N = 1;
 
 /////////////////////////////////////////////////////////////
 

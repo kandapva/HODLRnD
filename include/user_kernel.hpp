@@ -116,11 +116,19 @@ public:
 
 class kernel_4d_test{
     double c = -1.0 / (4 * PI);
+    double h = 1.0 / numPoints;
+    double h4 = pow(h, 4.0);
+    double kii = 0.0;
 public:
     std::vector<ptsnD> *gridPoints;
     kernel_4d_test()
     {
             // location of particles in the domain
+            double *a = new double[4];
+            double *b = new double[4];
+            a[0] = 0, a[1] = 0, a[2] = 0, a[3] = 0;
+            b[0] = h * 0.5, b[1] = h * 0.5, b[2] = h * 0.5, b[3] = h * 0.5;
+            kii = 1.0 + quadruple_integral(a, b); // Second kind
             gridPoints = new std::vector<ptsnD>;
             // Nodes in one dimension # Test considers a tensor grid in NDIM using loc_dir
             VectorXd loc_dir[NDIM];
@@ -158,25 +166,14 @@ public:
     // The Green's function in 4D
     dtype_base Kernel_Fun(dtype_base x)
     {
-            return c * log(x);
+            return c * exp(-x);
     }
     dtype_base getMatrixEntry(int i, int j)
     {
-            double r;
-            double h = 1.0/numPoints;
-            double h4 = pow(h,4.0);
-            if (i == j){
-                double* a = new double[4];
-                double* b = new double[4];
-
-                a[0] = 0, a[1] = 0, a[2] = 0, a[3] = 0;
-                b[0] = h*0.5, b[1] = h*0.5, b[2] = h*0.5, b[3] = h*0.5;
-                r = 1.0 + quadruple_integral(a,b);         // Second kind
-                //r = sqrt(N);
-            }
+            if (i == j)
+                return kii;
             else
-                r = h4 * Kernel_Fun(nd_points::euclidean_distance(gridPoints->at(i), gridPoints->at(j)));
-            return r;
+                return (h4 * Kernel_Fun(nd_points::euclidean_distance(gridPoints->at(i), gridPoints->at(j))));
     }
     ~kernel_4d_test(){}
 };

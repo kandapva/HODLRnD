@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "HDD_matrix.hpp"
 #include "HDD_clusters.hpp"
 #include "kernel_function.hpp"
@@ -8,11 +9,14 @@
 // #include "../integral_equation_4D/integral4d.hpp"
 using namespace std;
 
-
-int main()
+int main(int argc, char *argv[])
 {
     std::vector<ptsnD>* gridPoints;
-
+    if(argc>1)
+        numPoints = atoi(argv[1]);
+    else
+        numPoints = 10;
+    N = pow(numPoints, NDIM);
     // Bounding box of the kernel
     Eigen::VectorXd X(NDIM), Y(NDIM);
     for (int i = 0; i < NDIM; ++i)
@@ -35,19 +39,21 @@ int main()
     Vec x_sol = Kmat.solve(b1);
     //Kmat.print_matrix_details();
     Kmat.print_matrix_statistics();
-    if (N < 3000)
+    if (N < 500000)
     {
+        b2 = Vec::Zero(N, 1);
         std::vector<size_t> v3;
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
             v3.push_back(i);
-        b2 = kernelfunc->getMatrix(v3, v3) * x_test; // Exact value matrix_vector
+        for (size_t i = 0; i < N; i++)
+            b2(i) = kernelfunc->getRow(i, v3).dot(x_test); // Exact value matrix_vector
         // b2 = Kmat * x_sol; // Exact value
         // std::cout << "x" << std::endl;
         // std::cout << x_test << std::endl;
         // std::cout << "x _ sol" << std::endl;
         // std::cout << x_sol << std::endl;
-        std::cout << "Relative Error.. hmatrix ... " << Vec_ops::relative_error(b2, b1) << std::endl;
-        //std::cout << "Relative Error.. GMRES ... " << Vec_ops::relative_error(x_sol, x_test) << std::endl;
+        std::cout << "Relative Error in hmatrix matvec ... " << Vec_ops::relative_error(b2, b1) << std::endl;
+        std::cout << "Relative Error in GMRES solution ... " << Vec_ops::relative_error(x_sol, x_test) << std::endl;
     }
     return 0;
 }

@@ -66,29 +66,18 @@ public:
                     Nlevel = obj_arr[level][j]->n_particles;
             }
             level++;
-            for (int i = 0; i < level; i++)
-                for (size_t j = 0; j < obj_arr[i].size(); j++)
-                    obj_lin_arr.push_back(obj_arr[i][j]);
         }
-        std::cout << "Tree Formed" << std::endl;
+        std::cout << "Tree Formed with depth " << level-1 << std::endl;
         // Mark level as leaf
         for (size_t j = 0; j < obj_arr[level-1].size(); j++)
             obj_arr[level-1][j]->isleaf = true;
-        // Connection to the other nodes
     }
     // Initialise the matrix operators
     void Initialise_tree(){
         double start = omp_get_wtime();
-#pragma omp parallel num_threads(nThreads) shared(obj_lin_arr, level)
-        {
-#pragma omp for schedule(dynamic, 1)
-            for (size_t j = 0; j < obj_lin_arr.size(); j++)
-                obj_lin_arr[j]->Initialize_node();
-// #pragma omp for collapse(2) schedule(dynamic, 1)
-//                     for (int i = 0; i < level; i++) for (size_t j = 0; j < obj_arr[i].size(); j++)
-//                         obj_arr[i][j]
-//                             ->Initialize_node();
-        }
+        for (int i = 0; i < level; i++)
+            for (size_t j = 0; j < obj_arr[i].size(); j++)
+                obj_arr[i][j]->Initialize_node();
         INIT_TIME = omp_get_wtime() - start;
         std::cout << "Matrix operators formed..." << std::endl;
     }
@@ -104,12 +93,9 @@ public:
         // perform node wise matrix vector
 // #pragma omp parallel for collapse(2) schedule(dynamic)
         double start = omp_get_wtime();
-#pragma omp parallel num_threads(nThreads) shared(obj_lin_arr, level)
-        {
-            #pragma omp for schedule(dynamic, 1)
-                for (size_t j = 0; j < obj_lin_arr.size(); j++)
-                    obj_lin_arr[j]->get_node_potential();
-        }
+        for (int i = 0; i < level; i++)
+            for (size_t j = 0; j < obj_arr[i].size(); j++)
+                obj_arr[i][j]->get_node_potential();
         MAT_VEC_TIME = omp_get_wtime() - start;
         // std::cout << "b compute" << std::endl;
         //  Collect the output vector
