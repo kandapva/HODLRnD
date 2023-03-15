@@ -26,6 +26,7 @@
 using std::string;
 using namespace Eigen;
 
+const std::string data_directory = "/Users/kandappanva/Documents/GitHub/HODLRnD/data/";
 const double PI = 4.0 * atan(1);
 
 const int nThreads = 4;
