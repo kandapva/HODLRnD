@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
     kernel_4d_test *ker = new kernel_4d_test();
     ker->get_points(gridPoints);
-    kernel_function<kernel_4d_test> *kernelfunc = new kernel_function<kernel_4d_test>(ker);
+    //kernel_function<kernel_4d_test> *kernelfunc = new kernel_function<kernel_4d_test>(ker);
     HODLRdD_matrix Kmat = HODLRdD_matrix(ker, gridPoints, X, Y);
     Kmat.Assemble_matrix_operators();
     Vec b_test,b_true,x_test,x_true;
