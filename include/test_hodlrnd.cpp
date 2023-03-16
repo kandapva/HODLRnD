@@ -6,7 +6,7 @@
 #include "points_dt.hpp"
 #include "LowRank_matrix.hpp"
 #include "user_kernel.hpp"
-// #include "../integral_equation_4D/integral4d.hpp"
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -30,31 +30,19 @@ int main(int argc, char *argv[])
     kernel_function<kernel_4d_test> *kernelfunc = new kernel_function<kernel_4d_test>(ker);
     HODLRdD_matrix Kmat = HODLRdD_matrix(ker, gridPoints, X, Y);
     Kmat.Assemble_matrix_operators();
-    Vec x, b, bl;
-
-    Vec b1,b2,x_test;
-    x_test = Vec::Random(N, 1);
+    Vec b_test,b_true,x_test,x_true;
+    std::string x_file_name = data_directory + "x_" + std::to_string(N) + ".bin";
+    std::string rhs_file_name = data_directory + "rhs_" + std::to_string(N) + ".bin";
+    x_true = storedata::load_vec(x_file_name);
+    b_true = storedata::load_vec(rhs_file_name);
     std::cout << "The size of K matrix " << Kmat.get_size() << std::endl;
-    b1 = Kmat * x_test;         // * Operator 
-    Vec x_sol = Kmat.solve(b1);
+    b_test = Kmat * x_true; // * Operator
+    x_test = Kmat.solve(b_true);
     //Kmat.print_matrix_details();
     Kmat.print_matrix_statistics();
-    if (N < 500000)
-    {
-        b2 = Vec::Zero(N, 1);
-        std::vector<size_t> v3;
-        for (size_t i = 0; i < N; i++)
-            v3.push_back(i);
-        for (size_t i = 0; i < N; i++)
-            b2(i) = kernelfunc->getRow(i, v3).dot(x_test); // Exact value matrix_vector
-        // b2 = Kmat * x_sol; // Exact value
-        // std::cout << "x" << std::endl;
-        // std::cout << x_test << std::endl;
-        // std::cout << "x _ sol" << std::endl;
-        // std::cout << x_sol << std::endl;
-        std::cout << "Relative Error in hmatrix matvec ... " << Vec_ops::relative_error(b2, b1) << std::endl;
-        std::cout << "Relative Error in GMRES solution ... " << Vec_ops::relative_error(x_sol, x_test) << std::endl;
-    }
+    std::cout << "Relative Error in matvec   ... " << Vec_ops::relative_error(b_true, b_test) << std::endl;
+    std::cout << "Relative Error in solution ... " << Vec_ops::relative_error(x_true, x_test) << std::endl;
+
     return 0;
 }
 
@@ -218,6 +206,26 @@ public:
     // kernelfunc->ACA_FAST(L,R,0.000001,v1,v2);
     // bl = L*(R.transpose()*x);
     // std::cout << "Relative Error (ACA).."<< Vec_ops::relative_error(b,bl) << std::endl;
+*/
+
+/* True solution test case
+
+    if (N < 500000)
+    {
+        b2 = Vec::Zero(N, 1);
+        std::vector<size_t> v3;
+        for (size_t i = 0; i < N; i++)
+            v3.push_back(i);
+        for (size_t i = 0; i < N; i++)
+            b2(i) = kernelfunc->getRow(i, v3).dot(x_test); // Exact value matrix_vector
+        // b2 = Kmat * x_sol; // Exact value
+        // std::cout << "x" << std::endl;
+        // std::cout << x_test << std::endl;
+        // std::cout << "x _ sol" << std::endl;
+        // std::cout << x_sol << std::endl;
+        std::cout << "Relative Error in hmatrix matvec ... " << Vec_ops::relative_error(b2, b1) << std::endl;
+        std::cout << "Relative Error in GMRES solution ... " << Vec_ops::relative_error(x_sol, x_test) << std::endl;
+    }
 */
 
 // ?? Interaction list
