@@ -1,5 +1,5 @@
 all:
-	g++-12 -std=c++17 -I/usr/local/include/eigen3 -fopenmp -O4 -DUSE_DOUBLE -Wall main.cpp -o test
+	g++ -std=c++17 -I/lfs/usrhome/phd/ma16d300/AFMM/lib -fopenmp -O4 -DUSE_DOUBLE -Wall main.cpp -o hd4dim
 
 clean:
-	rm test
+	rm hd4dim

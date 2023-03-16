@@ -1,0 +1,3 @@
+Time for parallel matvec.. 10000 0.518311
+Time for parallel matvec.. 50625 12.0993
+Time for parallel matvec.. 104976 52.4505
