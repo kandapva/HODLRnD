@@ -36,7 +36,7 @@ const int NDIM = 4;
 const int Nmax = 1000;
 int numPoints = 10;         // Along 1D
 // The admissibility is based on the max norm of the center
-const int INTERACTION_TYPE_ALLOWED = 1; // This represents d'
+const int INTERACTION_TYPE_ALLOWED = -1; // This represents d'
 // 2D 
 // d' = 0 -> Vertex, HODLR2D 
 // d' = 1 -> HODLR in 2D
