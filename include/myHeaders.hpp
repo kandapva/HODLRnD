@@ -26,7 +26,8 @@
 using std::string;
 using namespace Eigen;
 
-const std::string data_directory = "/lfs/usrhome/phd/ma16d300/HODLRnD/data/";
+//const std::string data_directory = "/lfs/usrhome/phd/ma16d300/HODLRnD/data/";
+const std::string data_directory = "/Users/kandappanva/Documents/GitHub/HODLRnD/data/";
 const double PI = 4.0 * atan(1);
 
 const int nThreads = 20;
@@ -36,7 +37,7 @@ const int NDIM = 4;
 const int Nmax = 1000;
 int numPoints = 10;         // Along 1D
 // The admissibility is based on the max norm of the center
-const int INTERACTION_TYPE_ALLOWED = -1; // This represents d'
+int INTERACTION_TYPE_ALLOWED = 0; // This represents d'
 // 2D 
 // d' = 0 -> Vertex, HODLR2D 
 // d' = 1 -> HODLR in 2D

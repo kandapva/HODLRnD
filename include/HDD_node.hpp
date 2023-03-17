@@ -133,15 +133,15 @@ void Node<Kernel>::Initialize_node()
         //         userkernel->ACA_FAST(L2P[i], P2M[i], eps_ACA,
         //                                          my_cluster->index_of_points,
         //                                          my_intr_list_addr[i]->my_cluster->index_of_points);
-        if (isleaf)
-        {
-            P2P = new Mat[n_neighbours];
-            P2P_self = userkernel->getMatrix(my_cluster->index_of_points, my_cluster->index_of_points);
-            for (int i = 0; i < n_neighbours; i++)
-                if (my_neighbour_addr[i]->n_particles != 0)
-                    P2P[i] = userkernel->getMatrix(my_cluster->index_of_points,
-                                                   my_neighbour_addr[i]->my_cluster->index_of_points);
-        }
+        // if (isleaf)
+        // {
+        //     // P2P = new Mat[n_neighbours];
+        //     // //P2P_self = userkernel->getMatrix(my_cluster->index_of_points, my_cluster->index_of_points);
+        //     // for (int i = 0; i < n_neighbours; i++)
+        //     //     if (my_neighbour_addr[i]->n_particles != 0)
+        //     //         P2P[i] = userkernel->getMatrix(my_cluster->index_of_points,
+        //     //                                        my_neighbour_addr[i]->my_cluster->index_of_points);
+        // }
     }
     node_potential = Vec::Zero(n_particles);
     //TODO : Initialise the matrix operator - Reduced memory
@@ -227,13 +227,17 @@ void Node<Kernel>::get_interaction_list()
     if(isleaf){
         if(n_particles != 0){
             //std::cout << "(" << P2P_self.rows() << "," << P2P_self.cols() <<") x ("<< node_charge.size() << "x1)" << std::endl;
-            node_potential += P2P_self * node_charge;
+            //node_potential += P2P_self * node_charge;
+            for (size_t i = 0; i < n_particles; i++)
+                    node_potential(i) += userkernel->getRow(my_cluster->index_of_points[i], my_cluster->index_of_points).dot(node_charge);
             //std::cout << "Neighbor id ";
             for (int i = 0; i < n_neighbours; i++)
             {
                 //std::cout  << my_neighbour_addr[i]->self_id << " " << std::endl;
                 if (my_neighbour_addr[i]->n_particles != 0)
-                    node_potential += P2P[i] * my_neighbour_addr[i]->node_charge;
+                    //node_potential += P2P[i] * my_neighbour_addr[i]->node_charge;
+                    for (size_t j = 0; j < n_particles; j++)
+                        node_potential(j) += userkernel->getRow(my_cluster->index_of_points[j], my_neighbour_addr[i]->my_cluster->index_of_points).dot(my_neighbour_addr[i]->node_charge);
             }
             //std::cout << "Neighbor id ";
         }

@@ -12,8 +12,10 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     std::vector<ptsnD>* gridPoints;
-    if(argc>1)
+    if(argc>1){
         numPoints = atoi(argv[1]);
+        INTERACTION_TYPE_ALLOWED = atoi(argv[2]);
+    }
     else
         numPoints = 10;
     N = pow(numPoints, NDIM);
