@@ -1,4 +1,0 @@
-HMATRIX START
-Root Formed
-Tree Formed with depth 3
-HMATRIX DONE
