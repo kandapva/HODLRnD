@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
     rhs     = Vec::Zero(N, 1);
     rhs_    = Vec::Zero(N, 1);
     double start;
-    std::string x_file_name = data_directory + "x_" + std::to_string(N) + ".bin";
-    std::string rhs_file_name = data_directory + "rhs_" + std::to_string(N) + ".bin";
+    std::string x_file_name = data_directory + "x_1overR2_" + std::to_string(N) + ".bin";
+    std::string rhs_file_name = data_directory + "rhs_1overR2_" + std::to_string(N) + ".bin";
     storedata::save_vec(x_file_name, x_test);
     start = omp_get_wtime();
 #pragma omp parallel num_threads(nThreads) shared(x_test, v3, kernelfunc, rhs_, N)
