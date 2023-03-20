@@ -175,7 +175,7 @@ public:
                 return kii;
             else
             {
-                return = Kernel_Fun(nd_points::euclidean_distance(gridPoints->at(i), gridPoints->at(j)));
+                return Kernel_Fun(nd_points::euclidean_distance(gridPoints->at(i), gridPoints->at(j)));
             }
                 
     }
