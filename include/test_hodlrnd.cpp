@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
     b_true = storedata::load_vec(rhs_file_name);
     std::cout << "The size of K matrix " << Kmat.get_size() << std::endl;
     b_test = Kmat * x_true; // * Operator
+    
     x_test = Kmat.solve(b_true);
     //Kmat.print_matrix_details();
     Kmat.print_matrix_statistics();
