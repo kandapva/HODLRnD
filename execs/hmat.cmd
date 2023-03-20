@@ -12,12 +12,12 @@ cp -R $PBS_O_WORKDIR/* .
 export OMP_NUM_THREADS=8
 export OMP_PLACES=cores
 
-./hodlrnd_hmat.app 10 -1 > hmat_10.txt
-./hodlrnd_hmat.app 15 -1 > hmat_15.txt
-./hodlrnd_hmat.app 18 -1 > hmat_18.txt
-./hodlrnd_hmat.app 27 -1 > hmat_27.txt
-./hodlrnd_hmat.app 30 -1 > hmat_30.txt
-./hodlrnd_hmat.app 22 -1 > hmat_22.txt
+./hodlrnd_hmat_omp.app 10 -1 > hmat_10.txt
+./hodlrnd_hmat_omp.app 15 -1 > hmat_15.txt
+./hodlrnd_hmat_omp.app 18 -1 > hmat_18.txt
+./hodlrnd_hmat_omp.app 22 -1 > hmat_22.txt
+./hodlrnd_hmat_omp.app 27 -1 > hmat_27.txt
+./hodlrnd_hmat_omp.app 30 -1 > hmat_30.txt
 
 mv ../job$tpdir $PBS_O_WORKDIR/.
 

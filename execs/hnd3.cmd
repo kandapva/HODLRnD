@@ -12,12 +12,12 @@ cp -R $PBS_O_WORKDIR/* .
 export OMP_NUM_THREADS=8
 export OMP_PLACES=cores
 
-./hodlrnd_dp_3.app 10 3 > hnd_3_10.txt
-./hodlrnd_dp_3.app 15 3 > hnd_3_15.txt
-./hodlrnd_dp_3.app 18 3 > hnd_3_18.txt
-./hodlrnd_dp_3.app 27 3 > hnd_3_27.txt
-./hodlrnd_dp_3.app 30 3 > hnd_3_30.txt
-./hodlrnd_dp_3.app 22 3 > hnd_3_22.txt
+./hodlrnd_hmat_omp.app 10 3 > hnd_3_10.txt
+./hodlrnd_hmat_omp.app 15 3 > hnd_3_15.txt
+./hodlrnd_hmat_omp.app 18 3 > hnd_3_18.txt
+./hodlrnd_hmat_omp.app 22 3 > hnd_3_22.txt
+./hodlrnd_hmat_omp.app 27 3 > hnd_3_27.txt
+./hodlrnd_hmat_omp.app 30 3 > hnd_3_30.txt
 
 mv ../job$tpdir $PBS_O_WORKDIR/.
 
