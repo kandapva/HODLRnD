@@ -1,0 +1,11 @@
+Restarted GMRES Parameters 
+Maximum Iterations : 234256
+Tolerance :1e-10
+Restart Iteration at 100
+Iter[1] : 1.4738011e-05
+Iter[2] : 5.623152e-08
+Iter[3] : 3.0838367e-10
+Reached Solution before Max_Iterations
+Residual : 1.5271924e-13
+Mat-Vec Time : 3.7744813
+Print using templated GMRES.....

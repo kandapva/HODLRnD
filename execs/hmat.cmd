@@ -7,7 +7,8 @@ tpdir=`echo $PBS_JOBID | cut -f 1 -d .`
 tempdir=$HOME/scratch/job$tpdir
 mkdir -p $tempdir
 cd $tempdir
-cp -R $PBS_O_WORKDIR/* .
+
+cp -R $PBS_O_WORKDIR/hodlrnd_hmat_omp.app .
 
 export OMP_NUM_THREADS=8
 export OMP_PLACES=cores
