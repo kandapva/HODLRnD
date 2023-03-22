@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
     HODLRdD_matrix Kmat = HODLRdD_matrix(ker, gridPoints, X, Y);
     Kmat.Assemble_matrix_operators();
     Vec b_test,b_true,x_test,x_true;
-    std::string x_file_name = data_directory + "x_" + std::to_string(N) + ".bin";
-    std::string rhs_file_name = data_directory + "rhs_" + std::to_string(N) + ".bin";
+    std::string x_file_name = data_directory + "x_1overR2_" + std::to_string(N) + ".bin";
+    std::string rhs_file_name = data_directory + "rhs_1overR2_" + std::to_string(N) + ".bin";
     x_true = storedata::load_vec(x_file_name);
     b_true = storedata::load_vec(rhs_file_name);
     std::cout << "The size of K matrix " << Kmat.get_size() << std::endl;
