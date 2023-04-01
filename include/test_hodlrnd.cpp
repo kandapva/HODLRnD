@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     kernel_4d_test *ker = new kernel_4d_test();
     ker->get_points(gridPoints);
-    //kernel_function<kernel_4d_test> *kernelfunc = new kernel_function<kernel_4d_test>(ker);
+    kernel_function<kernel_4d_test> *kernelfunc = new kernel_function<kernel_4d_test>(ker);
     HODLRdD_matrix Kmat = HODLRdD_matrix(ker, gridPoints, X, Y);
     Kmat.Assemble_matrix_operators();
     Vec b_test,b_true,x_test,x_true;
@@ -37,14 +37,26 @@ int main(int argc, char *argv[])
     std::string rhs_file_name = data_directory + "rhs_1overR2_" + std::to_string(N) + ".bin";
     x_true = storedata::load_vec(x_file_name);
     b_true = storedata::load_vec(rhs_file_name);
+    std::vector<size_t> v3;
+    for (size_t i = 0; i < N; i++)
+        v3.push_back(i);
+    b_true = Vec::Zero(N, 1);
+#pragma omp parallel num_threads(nThreads) shared(x_true, v3, kernelfunc, b_true, N)
+    {
+#pragma omp for schedule(dynamic, 10)
+        for (size_t i = 0; i < N; i++)
+            b_true(i) = kernelfunc->getRow(i, v3).dot(x_true);
+    }
     std::cout << "The size of K matrix " << Kmat.get_size() << std::endl;
+    
     b_test = Kmat * x_true; // * Operator
     
-    x_test = Kmat.solve(b_true);
-    //Kmat.print_matrix_details();
+    //x_test = Kmat.solve(b_true);
     Kmat.print_matrix_statistics();
+    //Kmat.print_matrix_details();
+    
     std::cout << "Relative Error in matvec   ... " << Vec_ops::relative_error(b_true, b_test) << std::endl;
-    std::cout << "Relative Error in solution ... " << Vec_ops::relative_error(x_true, x_test) << std::endl;
+    //std::cout << "Relative Error in solution ... " << Vec_ops::relative_error(x_true, x_test) << std::endl;
 
     return 0;
 }

@@ -26,8 +26,8 @@
 using std::string;
 using namespace Eigen;
 
-const std::string data_directory = "/lfs/usrhome/phd/ma16d300/HODLRnD/data/";
-//const std::string data_directory = "/Users/kandappanva/Documents/GitHub/HODLRnD/data/";
+//const std::string data_directory = "/lfs/usrhome/phd/ma16d300/HODLRnD/data/";
+const std::string data_directory = "/Users/kandappanva/Documents/GitHub/HODLRnD/data/";
 const double PI = 4.0 * atan(1);
 
 const int nThreads = 8;
@@ -46,7 +46,7 @@ int INTERACTION_TYPE_ALLOWED = 0; // This represents d'
 // d' = 1 -> edge
 // d' = 2 -> face 
 const double eps_ACA = pow(10,-10);
-const int SYS_SIZE = 2 * Nmax;
+const int SYS_SIZE = 100;
 size_t N = 1;
 
 /////////////////////////////////////////////////////////////
