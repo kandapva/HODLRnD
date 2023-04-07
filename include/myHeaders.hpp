@@ -46,7 +46,7 @@ int INTERACTION_TYPE_ALLOWED = 0; // This represents d'
 // d' = 1 -> edge
 // d' = 2 -> face 
 const double eps_ACA = pow(10,-10);
-const int SYS_SIZE = 100;
+const int SYS_SIZE = 1000;
 size_t N = 1;
 
 /////////////////////////////////////////////////////////////

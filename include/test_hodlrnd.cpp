@@ -32,11 +32,11 @@ int main(int argc, char *argv[])
     kernel_function<kernel_4d_test> *kernelfunc = new kernel_function<kernel_4d_test>(ker);
     HODLRdD_matrix Kmat = HODLRdD_matrix(ker, gridPoints, X, Y);
     Kmat.Assemble_matrix_operators();
-    Vec b_test,b_true,x_test,x_true;
-    std::string x_file_name = data_directory + "x_1overR2_" + std::to_string(N) + ".bin";
-    std::string rhs_file_name = data_directory + "rhs_1overR2_" + std::to_string(N) + ".bin";
-    x_true = storedata::load_vec(x_file_name);
-    b_true = storedata::load_vec(rhs_file_name);
+    Vec b_test,b_true,x_test,x_true = Vec::Random(N);
+    //std::string x_file_name = data_directory + "x_1overR2_" + std::to_string(N) + ".bin";
+    //std::string rhs_file_name = data_directory + "rhs_1overR2_" + std::to_string(N) + ".bin";
+    //x_true = storedata::load_vec(x_file_name);
+    //b_true = storedata::load_vec(rhs_file_name);
     std::vector<size_t> v3;
     for (size_t i = 0; i < N; i++)
         v3.push_back(i);

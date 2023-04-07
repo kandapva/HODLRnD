@@ -128,8 +128,8 @@ public:
             for (int i = 0; i < level; i++)
                 for (size_t j = 0; j < obj_arr[i].size(); j++)
                 {
-                    n_FLOP += obj_arr[i][j]->compute_flop_count();
-                    obj_arr[i][j]->find_max_rank(MAX_RANK);
+                    n_FLOP += obj_arr[i][j]->compute_flop_count() + obj_arr[i][j]->my_flop_il;
+                    MAX_RANK = std::max(MAX_RANK,obj_arr[i][j]->node_rank);
                 }
         }
         void print_tree_details()
