@@ -16,7 +16,6 @@ class Node
     // Matrix operators ... Full memory
     Mat P2P_self;
     Mat *P2P, *P2M, *L2P;
-    LowRankMat<Kernel> *LR;
     Vec node_charge;
     Vec node_potential;
     // Matrix operators ... reduced memory
@@ -41,6 +40,8 @@ public:
     std::vector<Node<Kernel> *> my_neighbour_addr;
     int n_neighbours, n_intraction;
     std::vector<Node<Kernel> *> my_intr_list_addr;
+    double my_flop_il = 0.0;
+    size_t node_rank;
     // Node can be initialised with just parent and child information
     Node(cluster*& src, kernel_function<Kernel>*& usr_)
     {
@@ -123,25 +124,24 @@ void Node<Kernel>::Initialize_node()
         node_charge = Vec::Zero(n_particles);
         L2P = new Mat[n_intraction];
         P2M = new Mat[n_intraction];
-        LR = new LowRankMat<Kernel>[n_intraction];
-        for (int i = 0; i < n_intraction; i++)
-            if (my_intr_list_addr[i]->n_particles != 0)
-                LR[i] = LowRankMat<Kernel>(userkernel, my_cluster->index_of_points,
-                                               my_intr_list_addr[i]->my_cluster->index_of_points);
+        // for (int i = 0; i < n_intraction; i++)
+        //     if (my_intr_list_addr[i]->n_particles != 0)
+        //         LR[i] = LowRankMat<Kernel>(userkernel, my_cluster->index_of_points,
+        //                                        my_intr_list_addr[i]->my_cluster->index_of_points);
         // for (int i = 0; i < n_intraction; i++) 
         //     if (my_intr_list_addr[i]->n_particles != 0)
         //         userkernel->ACA_FAST(L2P[i], P2M[i], eps_ACA,
         //                                          my_cluster->index_of_points,
         //                                          my_intr_list_addr[i]->my_cluster->index_of_points);
-        if (isleaf)
-        {
-            P2P = new Mat[n_neighbours];
-            P2P_self = userkernel->getMatrix(my_cluster->index_of_points, my_cluster->index_of_points);
-            for (int i = 0; i < n_neighbours; i++)
-                if (my_neighbour_addr[i]->n_particles != 0)
-                    P2P[i] = userkernel->getMatrix(my_cluster->index_of_points,
-                                                   my_neighbour_addr[i]->my_cluster->index_of_points);
-        }
+        // if (isleaf)
+        // {
+        //     // P2P = new Mat[n_neighbours];
+        //     // //P2P_self = userkernel->getMatrix(my_cluster->index_of_points, my_cluster->index_of_points);
+        //     // for (int i = 0; i < n_neighbours; i++)
+        //     //     if (my_neighbour_addr[i]->n_particles != 0)
+        //     //         P2P[i] = userkernel->getMatrix(my_cluster->index_of_points,
+        //     //                                        my_neighbour_addr[i]->my_cluster->index_of_points);
+        // }
     }
     node_potential = Vec::Zero(n_particles);
     //TODO : Initialise the matrix operator - Reduced memory
@@ -182,42 +182,42 @@ void Node<Kernel>::get_interaction_list()
     template <class Kernel>
     double Node<Kernel>::compute_flop_count()
     {
-        double my_flop = 0.0;
+        double my_flop_nn = 0.0;
         if(n_particles != 0){
             if(this->isleaf){
-                my_flop += n_particles;
+                my_flop_nn += n_particles;
                 for (int i = 0; i < n_neighbours; i++){
                     if (my_neighbour_addr[i]->n_particles != 0)
-                        my_flop += my_neighbour_addr[i]->n_particles;
+                        my_flop_nn += my_neighbour_addr[i]->n_particles;
                 }
-                my_flop *= n_particles;
+                my_flop_nn *= n_particles;
             }
-            for (int i = 0; i < n_intraction; i++){
-                if (my_intr_list_addr[i]->n_particles != 0){
-                    my_flop += LR[i].rank() * (n_particles + my_intr_list_addr[i]->n_particles);
-                }
-            }
+            // for (int i = 0; i < n_intraction; i++){
+            //     if (my_intr_list_addr[i]->n_particles != 0){
+            //         my_flop += LR[i].rank() * (n_particles + my_intr_list_addr[i]->n_particles);
+            //     }
+            // }
         }    
-        return my_flop;
+        return my_flop_nn;
     }
 
-    template <class Kernel>
-    void Node<Kernel>::find_max_rank(size_t& MAX_RANK){
-        size_t tmp = MAX_RANK;
-        if(n_particles != 0){
-            for (int i = 0; i < n_intraction; i++)
-            {
-                if (my_intr_list_addr[i]->n_particles != 0)
-                {
-                    if ((size_t) LR[i].rank() > tmp)
-                    {
-                        tmp = LR[i].rank();
-                    }
-                }
-            }
-        }
-        MAX_RANK = tmp;
-    }
+    // template <class Kernel>
+    // void Node<Kernel>::find_max_rank(size_t& MAX_RANK){
+    //     size_t tmp = MAX_RANK;
+    //     if(n_particles != 0){
+    //         for (int i = 0; i < n_intraction; i++)
+    //         {
+    //             if (my_intr_list_addr[i]->n_particles != 0)
+    //             {
+    //                 if ((size_t) LR[i].rank() > tmp)
+    //                 {
+    //                     tmp = LR[i].rank();
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     MAX_RANK = tmp;
+    // }
 
     template <class Kernel>
     void Node<Kernel>::get_node_potential()
@@ -227,13 +227,17 @@ void Node<Kernel>::get_interaction_list()
     if(isleaf){
         if(n_particles != 0){
             //std::cout << "(" << P2P_self.rows() << "," << P2P_self.cols() <<") x ("<< node_charge.size() << "x1)" << std::endl;
-            node_potential += P2P_self * node_charge;
+            //node_potential += P2P_self * node_charge;
+            for (size_t i = 0; i < n_particles; i++)
+                    node_potential(i) += userkernel->getRow(my_cluster->index_of_points[i], my_cluster->index_of_points).dot(node_charge);
             //std::cout << "Neighbor id ";
             for (int i = 0; i < n_neighbours; i++)
             {
                 //std::cout  << my_neighbour_addr[i]->self_id << " " << std::endl;
                 if (my_neighbour_addr[i]->n_particles != 0)
-                    node_potential += P2P[i] * my_neighbour_addr[i]->node_charge;
+                    //node_potential += P2P[i] * my_neighbour_addr[i]->node_charge;
+                    for (size_t j = 0; j < n_particles; j++)
+                        node_potential(j) += userkernel->getRow(my_cluster->index_of_points[j], my_neighbour_addr[i]->my_cluster->index_of_points).dot(my_neighbour_addr[i]->node_charge);
             }
             //std::cout << "Neighbor id ";
         }
@@ -245,9 +249,17 @@ void Node<Kernel>::get_interaction_list()
         //std::cout << my_intr_list_addr[i]->self_id << " ";
         // if (my_intr_list_addr[i]->n_particles != 0)
         //     node_potential += (L2P[i] * (P2M[i].transpose() * my_intr_list_addr[i]->node_charge));
-        if (my_intr_list_addr[i]->n_particles != 0)
+        if (my_intr_list_addr[i]->n_particles != 0){
+            LowRankMat<Kernel> *LR = new LowRankMat<Kernel>[n_intraction];
+            LR[i] = LowRankMat<Kernel>(userkernel, my_cluster->index_of_points,
+                                               my_intr_list_addr[i]->my_cluster->index_of_points);
+
             node_potential += LR[i] * my_intr_list_addr[i]->node_charge;
+
+            this->my_flop_il += LR[i].rank() * (n_particles + my_intr_list_addr[i]->n_particles);
+            this->node_rank = LR[i].rank();
         }
+    }
     //std::cout << std::endl;
 
     // TODO : Routine Reduced memory matvec

@@ -1,0 +1,5 @@
+HMATRIX START
+Root Formed
+Tree Formed with depth 2
+HMATRIX DONE
+Matrix operators formed...

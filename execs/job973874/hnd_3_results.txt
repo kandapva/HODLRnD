@@ -1,0 +1,55 @@
+The size of K matrix 10000
+
+Mar 16 2023,21:12:26
+
+Memory (in GB) : 0.44095
+Number of FLOP : 5.51188e+07
+Compression Ratio : 0.551188
+Maximum rank across the Tree : 264
+Time to Initialize (in s) : 7.94307
+Matrix-Vector time (in s) : 0.040566
+Relative Error in matvec   ... 1.36421e-09
+Relative Error in solution ... 1.36438e-09
+
+The size of K matrix 50625
+GMRES status : 3
+
+Mar 16 2023,21:12:26
+
+Memory (in GB) : 4.28186
+Number of FLOP : 5.35233e+08
+Compression Ratio : 0.208839
+Maximum rank across the Tree : 719
+Time to Initialize (in s) : 189.126
+Matrix-Vector time (in s) : 17.7426
+Relative Error in matvec   ... 1.162e-08
+Relative Error in solution ... 1.16216e-08
+
+The size of K matrix 104976
+GMRES status : 3
+
+Mar 16 2023,21:12:26
+
+Memory (in GB) : 11.4392
+Number of FLOP : 1.42989e+09
+Compression Ratio : 0.129755
+Maximum rank across the Tree : 941
+Time to Initialize (in s) : 803.34
+Matrix-Vector time (in s) : 51.843
+Relative Error in matvec   ... 4.69978e-08
+Relative Error in solution ... 4.70112e-08
+
+The size of K matrix 531441
+GMRES status : 3
+
+Mar 16 2023,21:12:26
+
+Memory (in GB) : 99.1371
+Number of FLOP : 1.23921e+10
+Compression Ratio : 0.0438769
+Maximum rank across the Tree : 2126
+Time to Initialize (in s) : 15948.8
+Matrix-Vector time (in s) : 565.576
+Relative Error in matvec   ... 8.39461e-07
+Relative Error in solution ... 8.39536e-07
+

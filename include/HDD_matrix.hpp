@@ -15,6 +15,7 @@ class HODLRdD_matrix
     kernel_function<Kernel> *kernel_func;
     std::vector<ptsnD> *gridPoints;
     cluster *src;
+    double solve_time = 0.0;
 public:
     // Constructor for the matrix data structure. Also, x1 and x2 is the bounding box of the cluster of points 
     HODLRdD_matrix(Kernel*& userkernel, std::vector<ptsnD>*& gPoints, Eigen::VectorXd x1, Eigen::VectorXd x2)
@@ -54,9 +55,13 @@ public:
         HODLRdD_matrix<Kernel> *mat_obj;
         mat_obj = this;
         iterSolver<HODLRdD_matrix<Kernel> > solve_obj(100, N, eps_ACA);
-        solve_obj.set_output_file("gmres_out.txt");
+        std::string gmres_history = "gmres_"+ std::to_string(N) +".txt";
+        solve_obj.set_output_file(gmres_history);
+        double start = omp_get_wtime();
         int k = solve_obj.GMRES(mat_obj, x, b);
-        std::cout << "GMRES status : " << k << std::endl;
+        start = omp_get_wtime() - start;
+        solve_time = start;
+        std::cout << "GMRES took " << start << " with status " << k << std::endl;
         // Routine to compute the GMRES iterations
         return x;
     }
@@ -82,6 +87,7 @@ public:
         std::cout << "Maximum rank across the Tree : " << MAX_RANK << std::endl;
         std::cout << "Time to Initialize (in s) : " << HODLRdD_tree->get_Init_time() << std::endl;
         std::cout << "Matrix-Vector time (in s) : " << HODLRdD_tree->get_mat_vec_time() << std::endl;
+        std::cout << "Time to solution   (in s) : " << this->solve_time << std::endl;
     }
     // Destructor
     ~HODLRdD_matrix(){

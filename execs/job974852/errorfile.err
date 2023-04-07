@@ -1,0 +1,18 @@
+terminate called after throwing an instance of 'cereal::Exception'
+  what():  Failed to read 1 bytes from input stream! Read 0
+/var/spool/pbs/mom_priv/jobs/974849.hn1.SC: line 15: 15522 Aborted                 (core dumped) ./hodlrnd_hmat_omp.app 10 -1 > hmat_10.txt
+terminate called after throwing an instance of 'cereal::Exception'
+  what():  Failed to read 1 bytes from input stream! Read 0
+/var/spool/pbs/mom_priv/jobs/974849.hn1.SC: line 16: 15543 Aborted                 (core dumped) ./hodlrnd_hmat_omp.app 15 -1 > hmat_15.txt
+terminate called after throwing an instance of 'cereal::Exception'
+  what():  Failed to read 1 bytes from input stream! Read 0
+/var/spool/pbs/mom_priv/jobs/974849.hn1.SC: line 17: 15682 Aborted                 (core dumped) ./hodlrnd_hmat_omp.app 18 -1 > hmat_18.txt
+terminate called after throwing an instance of 'cereal::Exception'
+  what():  Failed to read 1 bytes from input stream! Read 0
+/var/spool/pbs/mom_priv/jobs/974849.hn1.SC: line 18: 15917 Aborted                 (core dumped) ./hodlrnd_hmat_omp.app 22 -1 > hmat_22.txt
+terminate called after throwing an instance of 'cereal::Exception'
+  what():  Failed to read 1 bytes from input stream! Read 0
+/var/spool/pbs/mom_priv/jobs/974849.hn1.SC: line 19: 17283 Aborted                 (core dumped) ./hodlrnd_hmat_omp.app 27 -1 > hmat_27.txt
+terminate called after throwing an instance of 'cereal::Exception'
+  what():  Failed to read 1 bytes from input stream! Read 0
+/var/spool/pbs/mom_priv/jobs/974849.hn1.SC: line 20: 19428 Aborted                 (core dumped) ./hodlrnd_hmat_omp.app 30 -1 > hmat_30.txt

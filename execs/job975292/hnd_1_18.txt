@@ -1,0 +1,19 @@
+HMATRIX START
+Root Formed
+Tree Formed with depth 2
+HMATRIX DONE
+Matrix operators formed...
+The size of K matrix 104976
+GMRES took 18.212 with status 3
+
+Mar 20 2023,16:01:33
+
+Memory (in GB) : 12.9377
+Number of FLOP : 1.61721e+09
+Compression Ratio : 0.146753
+Maximum rank across the Tree : 102
+Time to Initialize (in s) : 10.4896
+Matrix-Vector time (in s) : 4.52321
+Time to solution   (in s) : 18.212
+Relative Error in matvec   ... 5.21593e-09
+Relative Error in solution ... 5.21651e-09

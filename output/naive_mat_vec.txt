@@ -1,0 +1,15 @@
+Time for parallel matvec.. 10000 0.518311
+Time for parallel matvec.. 50625 12.0993
+Time for parallel matvec.. 104976 52.4505
+Time for parallel matvec.. 531441 1354.49
+Time for parallel matvec.. 1048576 5231.73
+Time for parallel matvec.. 234256 259.984
+Time for parallel matvec.. 810000 3171.88
+OneOverR2
+OneOverR2
+Time for parallel matvec.. 10000 0.131191
+Time for parallel matvec.. 50625 2.51796
+Time for parallel matvec.. 104976 10.8344
+Time for parallel matvec.. 234256 60.4056
+Time for parallel matvec.. 531441 335.251
+Time for parallel matvec.. 810000 788.7

@@ -54,7 +54,11 @@ public:
             // //std::cout << "(" << t2.size() << ")" << std::endl;
             Mat Ac = userkernel->getMatrix(row_id, col_basis);
             Mat Ar = userkernel->getMatrix(row_basis, col_id);
-            Vec t2 = K->solve(Ar * x);
+            // Vec t2 = K->solve(Ar * x);
+            // b = Ac * t2;
+            Vec t0 = Ar * x;
+            Vec t1 = L.triangularView<Eigen::Lower>().solve(t0);
+            Vec t2 = R.triangularView<Eigen::Upper>().solve(t1);
             b = Ac * t2;
         }
         else
@@ -694,31 +698,31 @@ public:
             if (computed_rank > 0)
             {
                 // Considered this QR mainly because of its comprise with speed and stability
-                Mat A = userkernel->getMatrix(row_basis,col_basis);
-                K = new ColPivHouseholderQR<Mat>(A); 
-                // for (int i = 0; i < computed_rank; i++)
-                // {
-                //     L(i, i) = 1.0;
-                //     if (i >= 1)
-                //     {
-                //         for (int j = 0; j <= i - 1; j++)
-                //         {
-                //             L(i, j) = u[j](row_ind[i]);
-                //         }
-                //     }
-                // }
-                // for (int i = 0; i < computed_rank; i++)
-                // {
-                //     R(i, i) = v[i](col_ind[i]);
-                //     if (i >= 1)
-                //     {
-                //         for (int j = 0; j <= i - 1; j++)
-                //         {
-                //             R(j, i) = v[j](col_ind[i]);
-                //             //R(j, i) = v[i](col_ind[j]);
-                //         }
-                //     }
-                // }
+                // Mat A = userkernel->getMatrix(row_basis,col_basis);
+                // K = new ColPivHouseholderQR<Mat>(A); 
+                for (int i = 0; i < computed_rank; i++)
+                {
+                    L(i, i) = 1.0;
+                    if (i >= 1)
+                    {
+                        for (int j = 0; j <= i - 1; j++)
+                        {
+                            L(i, j) = u[j](row_ind[i]);
+                        }
+                    }
+                }
+                for (int i = 0; i < computed_rank; i++)
+                {
+                    R(i, i) = v[i](col_ind[i]);
+                    if (i >= 1)
+                    {
+                        for (int j = 0; j <= i - 1; j++)
+                        {
+                            R(j, i) = v[j](col_ind[i]);
+                            //R(j, i) = v[i](col_ind[j]);
+                        }
+                    }
+                }
             }
         }
     }
