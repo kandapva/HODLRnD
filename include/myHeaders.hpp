@@ -38,6 +38,8 @@ const int Nmax = 1000;
 int numPoints = 10;         // Along 1D
 // The admissibility is based on the max norm of the center
 int INTERACTION_TYPE_ALLOWED = 0; // This represents d'
+double init_time = 0.0;
+double meas_time = 0.0;
 // 2D 
 // d' = 0 -> Vertex, HODLR2D 
 // d' = 1 -> HODLR in 2D

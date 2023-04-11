@@ -250,14 +250,17 @@ void Node<Kernel>::get_interaction_list()
         // if (my_intr_list_addr[i]->n_particles != 0)
         //     node_potential += (L2P[i] * (P2M[i].transpose() * my_intr_list_addr[i]->node_charge));
         if (my_intr_list_addr[i]->n_particles != 0){
+            double tmp = omp_get_wtime();
             LowRankMat<Kernel> *LR = new LowRankMat<Kernel>[n_intraction];
             LR[i] = LowRankMat<Kernel>(userkernel, my_cluster->index_of_points,
                                                my_intr_list_addr[i]->my_cluster->index_of_points);
-
+            init_time += omp_get_wtime() - tmp;
             node_potential += LR[i] * my_intr_list_addr[i]->node_charge;
-
+            tmp = omp_get_wtime();
             this->my_flop_il += LR[i].rank() * (n_particles + my_intr_list_addr[i]->n_particles);
-            this->node_rank = LR[i].rank();
+            if (this->node_rank < LR[i].rank())
+                this->node_rank = LR[i].rank();
+            meas_time += omp_get_wtime() - tmp;
         }
     }
     //std::cout << std::endl;

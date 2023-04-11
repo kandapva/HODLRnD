@@ -97,6 +97,8 @@ public:
     // mat-vec product
     Vec mat_vec(Vec& x){
         Vec b = Vec::Zero(x.size());
+        init_time = 0.0;
+        meas_time = 0.0;
         // Using openMP here requires a memeory race while reading
         for (int i = 0; i < level; i++)
             for (size_t j = 0; j < obj_arr[i].size(); j++)
@@ -108,19 +110,19 @@ public:
         // for (int i = 0; i < level; i++)
         //     for (size_t j = 0; j < obj_arr[i].size(); j++)
         //         obj_arr[i][j]->get_node_potential();
-        #pragma omp parallel num_threads(nThreads) shared(obj_lin_arr, n_nodes)
-        {
-            #pragma omp for schedule(dynamic, 1)
-            for (size_t i = 0; i < n_nodes; i++)
-                obj_lin_arr[i]->get_node_potential();
-        }
+        for (size_t i = 0; i < n_nodes; i++)
+            obj_lin_arr[i]->get_node_potential();
+
         MAT_VEC_TIME = omp_get_wtime() - start;
         // std::cout << "b compute" << std::endl;
         //  Collect the output vector
-        for (int i = 0; i < level; i++) for (size_t j = 0; j < obj_arr[i].size(); j++)
-            obj_arr[i][j]->collect_potential(b);
+        for (int i = 0; i < level; i++) 
+            for (size_t j = 0; j < obj_arr[i].size(); j++)
+                obj_arr[i][j]->collect_potential(b);
         // std::cout << "b calculate" << std::endl;
         // std::cout << "Mat-vec performed..." << std::endl;
+        INIT_TIME = init_time;
+        MAT_VEC_TIME -= (init_time + meas_time); 
         return b;
         }
         void get_stat(double &n_FLOP, size_t &MAX_RANK)
