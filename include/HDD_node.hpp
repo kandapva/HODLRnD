@@ -264,6 +264,32 @@ void Node<Kernel>::get_interaction_list()
         }
     }
     //std::cout << std::endl;
+    void update_matrix_node(std::vector<std::vector<bool>>& mat_color, int lvl)
+    {
+        // Create source list corresponding to leaf nodes, lvl is 4^{leaf_level - my_level}
+        std::vector<size_t> row_indices;
+        int drift = pow(pow(2,NDIM), lvl);
+        int start_index = drift * int(this->self_id);
+        for(int i=0; i< drift; i++)
+            row_indices.push_back(start_index + i);
+
+        // update the mat color based on the interaction list in the matrix
+        for (int i = 0; i < n_intraction; i++)
+        {
+            // Create target list corresponding to leaf nodes
+            std::vector<size_t> col_indices;
+            start_index = drift * int(my_intr_list_addr[i]->self_id);
+            for (int k = 0; k < drift; k++)
+                row_indices.push_back(start_index + k);
+
+            // Make appropriate color changes
+            for (int j = 0; j < row_indices.size(); j++)
+                for (int k = 0; k < col_indices.size(); k++)
+                {
+                    mat_color[j][k] = true;
+                }
+        }
+    }
 
     // TODO : Routine Reduced memory matvec
 }

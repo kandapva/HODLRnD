@@ -5,6 +5,8 @@
 #include "HDD_node.hpp" 
 #include "HDD_clusters.hpp"
 
+#include <fstream>
+
 // Hierarchical Tree structure
 template <class Kernel>
 class Tree
@@ -150,6 +152,54 @@ public:
                 std::cout << "______________________________" << std::endl;
             }
         }
+
+        void print_matrix_latex(){
+            // Constructs a block matrix representation of h-matrix with n_leaf x n_leaf
+            // Color is default red, based on the interaction list each node updates the 
+            // color to cyan if low-rank
+            size_t n_leaf = obj_arr[level - 1];
+            std::vector<std::vector<bool> > mat_color;
+            for (int i = 0; i < n_leaf; i++)
+            {
+                vector<bool> tmp;
+                for (int j = 0; j < n_leaf; j++)
+                    tmp.push_back(false);
+                mat_color.push_back(tmp);
+            }
+            for (int i = 0; i < level; i++)
+            {
+                for (size_t j = 0; j < obj_arr[i].size(); j++)
+                    obj_arr[i][j]->update_matrix_node(mat_color, level-1);
+            }
+            ofstream latex_file;
+            outfile.open("h_matrix.tex");
+            // Write to tex file
+            latex_file << "\\documentclass{article}" << std::endl;
+            latex_file << "\\usepackage{tikz}" << std::endl;
+            latex_file << std::endl;
+            latex_file << "\\begin{document}" << std::endl;
+            latex_file << std::endl;
+            latex_file << "\\begin{tikzpicture}" << std::endl;
+            latex_file << "\\matrix (M) [matrix of nodes, nodes in empty cells, column sep=-\\pgflinewidth, row sep=-\\pgflinewidth, nodes={minimum width=1cm, minimum height=1cm, outer sep=0pt, fill, draw=none, anchor=center}]" << std::endl;
+            latex_file << "{" << std::endl;
+            for (int i = 0; i < n_leaf; i++){
+                for(int j = 0; j < n_leaf; j++){
+                    if(j != 0)
+                        latex_file << "&";
+                    if(!mat_color[i][j])
+                        latex_file << " |[fill = red]| ";
+                    else 
+                        latex_file << " |[fill = cyan]| ";
+                }
+                latex_file << " \\\\" << std::endl;
+            }
+            latex_file  << "};" << endl;
+            latex_file << "\\end{tikzpicture}" << endl;
+            latex_file << endl;
+            latex_file << "\\end{document}" << endl;
+            latex_file.close();
+        }
+
         double get_mat_vec_time(){
             return MAT_VEC_TIME;
         }
