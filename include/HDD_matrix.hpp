@@ -71,7 +71,12 @@ public:
         std::cout << "====================================" << std::endl;
     }
 
-    void print_matrix_statistics(){
+    void print_matrix_latex(){
+        HODLRdD_tree->print_matrix_latex();
+    }
+
+    void print_matrix_statistics()
+    {
         double n_FLOP = 0.0;
         size_t MAX_RANK = 0;
         double compression_ratio = 1.0/(double(N)*double(N));

@@ -32,3 +32,9 @@ test
 *.app
 *.cmd
 .vscode/
+*.aux
+*.fdb_latexmk
+*.log
+*.pdf
+*.gz
+*.fls

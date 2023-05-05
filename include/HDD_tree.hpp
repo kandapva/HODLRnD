@@ -157,48 +157,56 @@ public:
             // Constructs a block matrix representation of h-matrix with n_leaf x n_leaf
             // Color is default red, based on the interaction list each node updates the 
             // color to cyan if low-rank
-            size_t n_leaf = obj_arr[level - 1];
-            std::vector<std::vector<bool> > mat_color;
-            for (int i = 0; i < n_leaf; i++)
+            size_t n_leaf = obj_arr[level - 1].size(); // Number of Leaf
+            std::vector<std::vector<int> > mat_color;
+            for (int i = 0; i < (int)n_leaf; i++)
             {
-                vector<bool> tmp;
-                for (int j = 0; j < n_leaf; j++)
-                    tmp.push_back(false);
+                std::vector<int> tmp;
+                for (int j = 0; j < (int)n_leaf; j++)
+                    tmp.push_back(0);
                 mat_color.push_back(tmp);
             }
             for (int i = 0; i < level; i++)
             {
-                for (size_t j = 0; j < obj_arr[i].size(); j++)
-                    obj_arr[i][j]->update_matrix_node(mat_color, level-1);
-            }
-            ofstream latex_file;
-            outfile.open("h_matrix.tex");
-            // Write to tex file
-            latex_file << "\\documentclass{article}" << std::endl;
-            latex_file << "\\usepackage{tikz}" << std::endl;
-            latex_file << std::endl;
-            latex_file << "\\begin{document}" << std::endl;
-            latex_file << std::endl;
-            latex_file << "\\begin{tikzpicture}" << std::endl;
-            latex_file << "\\matrix (M) [matrix of nodes, nodes in empty cells, column sep=-\\pgflinewidth, row sep=-\\pgflinewidth, nodes={minimum width=1cm, minimum height=1cm, outer sep=0pt, fill, draw=none, anchor=center}]" << std::endl;
-            latex_file << "{" << std::endl;
-            for (int i = 0; i < n_leaf; i++){
-                for(int j = 0; j < n_leaf; j++){
-                    if(j != 0)
-                        latex_file << "&";
-                    if(!mat_color[i][j])
-                        latex_file << " |[fill = red]| ";
-                    else 
-                        latex_file << " |[fill = cyan]| ";
+                for (size_t j = 0; j < obj_arr[i].size(); j++){
+                    obj_arr[i][j]->update_matrix_node(mat_color, int(level - 1 -i));
                 }
-                latex_file << " \\\\" << std::endl;
             }
-            latex_file  << "};" << endl;
-            latex_file << "\\end{tikzpicture}" << endl;
-            latex_file << endl;
-            latex_file << "\\end{document}" << endl;
+
+                std::ofstream latex_file;
+                latex_file.open("h_matrix.tex");
+                // Write to tex file
+                latex_file << "\\documentclass{article}" << std::endl;
+                latex_file << "\\usepackage{tikz}" << std::endl;
+                latex_file << "\\usetikzlibrary{matrix}" << std::endl;
+                latex_file << std::endl;
+                latex_file << "\\begin{document}" << std::endl;
+                latex_file << std::endl;
+                latex_file << "\\begin{tikzpicture}[scale=0.5]" << std::endl;
+                latex_file << "\\fill[red!50](0,0) rectangle(-16,-16);" << std::endl;
+                double dist = -16.0/n_leaf;
+                double a,b;
+                for (int i = 0; i < (int)n_leaf; i++)
+                {
+                    for (int j = 0; j < (int)n_leaf; j++)
+                    {
+                    // a = dist*i;
+                    // b = dist*j;
+                    if(j==0)
+                        latex_file << mat_color[i][j];
+                    else
+                        latex_file << ","  << mat_color[i][j];
+                    // if(mat_color[i][j] > 0)
+                    //     latex_file << "\\fill[cyan!50](" << a << "," << b << ") rectangle(" << a + dist << "," << b + dist << ");" << std::endl;
+                }
+                latex_file << ";" << std::endl;
+            }
+
+            latex_file << "\\end{tikzpicture}" << std::endl;
+            latex_file << std::endl;
+            latex_file << "\\end{document}" << std::endl;
             latex_file.close();
-        }
+            }
 
         double get_mat_vec_time(){
             return MAT_VEC_TIME;

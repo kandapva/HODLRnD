@@ -77,6 +77,7 @@ public:
 
     void Initialize_node();
     void find_max_rank(size_t &MAX_RANK);
+    void update_matrix_node(std::vector<std::vector<int>>& mat_color, int lvl);
     double compute_flop_count();
     void get_interaction_list();
     void get_node_potential();
@@ -177,7 +178,7 @@ void Node<Kernel>::get_interaction_list()
     }
     this->n_neighbours = this->my_neighbour_addr.size();
     this->n_intraction = this->my_intr_list_addr.size();
-    }
+}
 
     template <class Kernel>
     double Node<Kernel>::compute_flop_count()
@@ -224,8 +225,10 @@ void Node<Kernel>::get_interaction_list()
     {
     // Routine for Full memory matvec
     //std::cout << "Self ID " << self_id << std::endl;
-    if(isleaf){
-        if(n_particles != 0){
+    if(isleaf)
+    {
+        if(n_particles != 0)
+        {
             //std::cout << "(" << P2P_self.rows() << "," << P2P_self.cols() <<") x ("<< node_charge.size() << "x1)" << std::endl;
             //node_potential += P2P_self * node_charge;
             for (size_t i = 0; i < n_particles; i++)
@@ -263,34 +266,36 @@ void Node<Kernel>::get_interaction_list()
             meas_time += omp_get_wtime() - tmp;
         }
     }
+    }
     //std::cout << std::endl;
-    void update_matrix_node(std::vector<std::vector<bool>>& mat_color, int lvl)
+    template<class Kernel>
+    void Node<Kernel>::update_matrix_node(std::vector<std::vector<int> >& mat_color, int lvl)
     {
         // Create source list corresponding to leaf nodes, lvl is 4^{leaf_level - my_level}
         std::vector<size_t> row_indices;
         int drift = pow(pow(2,NDIM), lvl);
         int start_index = drift * int(this->self_id);
         for(int i=0; i< drift; i++)
-            row_indices.push_back(start_index + i);
+            row_indices.push_back((size_t)start_index + i);
 
         // update the mat color based on the interaction list in the matrix
         for (int i = 0; i < n_intraction; i++)
         {
             // Create target list corresponding to leaf nodes
-            std::vector<size_t> col_indices;
+            std::vector<size_t> col_indices;      
+
             start_index = drift * int(my_intr_list_addr[i]->self_id);
             for (int k = 0; k < drift; k++)
-                row_indices.push_back(start_index + k);
+                col_indices.push_back((size_t)start_index + k);
 
             // Make appropriate color changes
-            for (int j = 0; j < row_indices.size(); j++)
-                for (int k = 0; k < col_indices.size(); k++)
+            for (int j = 0; j < (int)row_indices.size(); j++)
+                for (int k = 0; k < (int)col_indices.size(); k++)
                 {
-                    mat_color[j][k] = true;
+                    mat_color[row_indices[j]][col_indices[k]] = 1;
                 }
         }
     }
 
     // TODO : Routine Reduced memory matvec
-}
 #endif

@@ -34,7 +34,7 @@ const int nThreads = 8;
 /////////////////////////////////////////////////////////////
 // HODLR matrix parameters
 const int NDIM = 4;
-const int Nmax = 1000;
+const int Nmax = 100;
 int numPoints = 10;         // Along 1D
 // The admissibility is based on the max norm of the center
 int INTERACTION_TYPE_ALLOWED = 0; // This represents d'
